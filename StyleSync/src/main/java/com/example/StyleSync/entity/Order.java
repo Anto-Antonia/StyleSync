@@ -31,6 +31,9 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> itemList = new ArrayList<>();
 
-    private String paymentMethod;
-    private String shippingAddress;
+    @Enumerated
+    private PaymentMethod paymentMethod;
+
+    @Embedded
+    private ShippingAddress shippingAddress;
 }
