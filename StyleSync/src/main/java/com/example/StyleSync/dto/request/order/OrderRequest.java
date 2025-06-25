@@ -1,7 +1,7 @@
 package com.example.StyleSync.dto.request.order;
 
+import com.example.StyleSync.dto.request.shipping.ShippingAddressRequest;
 import com.example.StyleSync.entity.PaymentMethod;
-import com.example.StyleSync.entity.ShippingAddress;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,5 +21,5 @@ public class OrderRequest {
     private PaymentMethod paymentMethod;
 
     @NotNull
-    private ShippingAddress shippingAddress;
+    private ShippingAddressRequest shippingAddress;
 }

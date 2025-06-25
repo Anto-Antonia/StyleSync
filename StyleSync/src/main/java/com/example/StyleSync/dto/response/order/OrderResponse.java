@@ -1,5 +1,7 @@
 package com.example.StyleSync.dto.response.order;
 
+import com.example.StyleSync.entity.OrderStatus;
+import com.example.StyleSync.entity.PaymentMethod;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,8 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderResponse {
     private Integer id;
-    private String paymentMethod;
-    private String status;
+    private PaymentMethod paymentMethod;
+    private OrderStatus status;
     private LocalDateTime createdAt;
     private String shippingAddress;
 

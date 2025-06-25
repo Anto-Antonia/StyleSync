@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ShippingAddress {
 
+    private String fullName;
+    private String phoneNumber;
+
     @NotBlank
     private String street;
 

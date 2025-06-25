@@ -1,5 +1,7 @@
 package com.example.StyleSync.dto.request.shipping;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +10,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ShippingAddressRequest {
-    private String street;
+    @NotBlank
+    private String fullName;
+
+    @NotBlank
+    private String phoneNumber;
+
+    @NotBlank
+    private String address;
+
+    @NotBlank
     private String city;
+
+    @NotBlank
     private String country;
+
+    @NotNull
     private Integer postalCode;
 }
