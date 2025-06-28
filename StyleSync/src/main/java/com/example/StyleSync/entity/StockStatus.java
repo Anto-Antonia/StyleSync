@@ -13,5 +13,4 @@ public enum StockStatus {
     StockStatus(String label) {
         this.label = label;
     }
-
 }

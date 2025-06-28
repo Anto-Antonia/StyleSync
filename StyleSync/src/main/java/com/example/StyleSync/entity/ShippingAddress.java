@@ -16,7 +16,7 @@ public class ShippingAddress {
     private String phoneNumber;
 
     @NotBlank
-    private String street;
+    private String address;
 
     @NotBlank
     private String city;

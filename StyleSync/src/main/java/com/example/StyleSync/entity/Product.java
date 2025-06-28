@@ -25,7 +25,7 @@ public class Product {
     @ManyToMany(mappedBy = "favoriteProducts")
     private List<User> favoriteByUser = new ArrayList<>();
     @Transient // makes sure this property is NOT PERSISTED TO THE DB
-    private StockStatus getStockStatus(){
+    public StockStatus getStockStatus(){
         if(quantity == 0){
             return StockStatus.OUT_OF_STOCK;
         } else if(quantity <= 10){
