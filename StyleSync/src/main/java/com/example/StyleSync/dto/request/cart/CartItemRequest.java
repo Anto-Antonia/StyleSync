@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class CartItemRequest {
 
     @NotNull
-    private Long productId;
+    private Integer productId;
 
     @NotNull @Min(0)
     private Integer quantity;
