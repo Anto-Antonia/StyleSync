@@ -25,7 +25,7 @@ public class User {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
-    private Role roles;
+    private Role role;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id")
@@ -39,4 +39,5 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
+
 }

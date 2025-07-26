@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,8 +18,8 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String roleName;
+    private String name; // from roleName to name
 
-    @OneToMany(mappedBy = "roles")
-    private List<User> users;
+    @OneToMany(mappedBy = "role")
+    private List<User> users = new ArrayList<>();
 }

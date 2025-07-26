@@ -1,4 +1,4 @@
-//package com.example.StyleSync.dto.response.role;
+//package com.example.StyleSync.dto.request.user;
 //
 //import lombok.AllArgsConstructor;
 //import lombok.Data;
@@ -7,6 +7,7 @@
 //@Data
 //@AllArgsConstructor
 //@NoArgsConstructor
-//public class RoleResponse {
-//    private String roleName;
+//public class UserUpdateUsername {
+//    String firstname;
+//    String lastname;
 //}
