@@ -18,7 +18,7 @@ public class OrderItem {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "order_id", columnDefinition = "BIGINT UNSIGNED")
     private Order order;
 
     @ManyToOne

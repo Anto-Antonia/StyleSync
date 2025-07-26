@@ -15,8 +15,10 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "orders")
 public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "BIGINT UNSIGNED")
     private Integer id;
 
     private LocalDateTime orderDate;
