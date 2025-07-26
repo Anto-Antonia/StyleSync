@@ -5,8 +5,10 @@ import com.example.StyleSync.dto.request.user.UserRequest;
 import com.example.StyleSync.dto.request.user.UserUpdateUsername;
 import com.example.StyleSync.dto.response.role.RoleResponse;
 import com.example.StyleSync.dto.response.user.UserResponse;
+import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.entity.Role;
 import com.example.StyleSync.entity.User;
+import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.exceptions.role.RoleNotFoundException;
 import com.example.StyleSync.exceptions.user.EmailAlreadyExistsException;
 import com.example.StyleSync.exceptions.user.UserNotFoundException;
@@ -15,6 +17,7 @@ import com.example.StyleSync.repository.ProductRepository;
 import com.example.StyleSync.repository.RoleRepository;
 import com.example.StyleSync.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +27,7 @@ import java.util.stream.Collectors;
 public class UserRoleServiceImpl implements UserRoleService{
 
     private static UserRepository userRepository;
-    private static RoleRepository repository;
+    private static RoleRepository roleRepository;
     private static ProductRepository productRepository;
     private static UserRoleMapper mapper;
 
@@ -41,7 +44,7 @@ public class UserRoleServiceImpl implements UserRoleService{
         user.setEmail(userRequest.getEmail());
         user.setPassword(userRequest.getPassword());
 
-        Role role = repository.findRoleByName("user")
+        Role role = roleRepository.findRoleByName("user")
                 .orElseThrow(()-> new RoleNotFoundException("Role 'user' not found in DB"));
 
         user.setRole(role);
@@ -76,31 +79,85 @@ public class UserRoleServiceImpl implements UserRoleService{
 
     @Override
     public void updateUserUsername(Integer id, UserUpdateUsername userUpdateUsername) {
+        Optional<User> optionalUser = userRepository.findById(id);
 
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            user.setFirstName(userUpdateUsername.getFirstname());
+            user.setLastName(userUpdateUsername.getLastname());
+            userRepository.save(user);
+        } else{
+            throw new UserNotFoundException("The user with id: " + id + " was not found");
+        }
     }
 
     @Override
     public void addItemToFavorite(Integer userId, Integer itemId) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(()-> new UserNotFoundException("User not found!"));
+    Product product = productRepository.findById(itemId)
+            .orElseThrow(()-> new ProductNotFoundException("Product not found."));
 
+    if(!user.getFavoriteProducts().contains(product)){
+        user.getFavoriteProducts().add(product);
+        userRepository.save(user);
+        }
     }
+
+    @Transactional
+    @Override
+    public void removeItemFromFavorite(Integer userId, Integer itemId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new UserNotFoundException("User not found!"));
+        Product product = productRepository.findById(itemId)
+                .orElseThrow(()-> new ProductNotFoundException("Product not found."));
+
+        if(!user.getFavoriteProducts().contains(product)){
+            user.getFavoriteProducts().remove(product);
+            userRepository.save(user);
+        }
+    }
+
 
     @Override
     public void deleteUser(Integer id) {
-
+    userRepository.deleteById(id);
     }
 
     @Override
-    public RoleResponse addRole(RoleRequest request) {
-        return null;
+    public Role addRole(RoleRequest request) {
+        Role role = mapper.fromRoleRequest(request);
+        return roleRepository.save(role);
+    }
+
+    @Override
+    public void addRoleToUser(Integer userId, String name) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new UserNotFoundException("User not found!"));
+        Role role =  roleRepository.findRoleByName(name)
+                .orElseThrow(()-> new RoleNotFoundException("Role with name: " + name + ", not found"));
+
+
+        user.setRole(role);
+        userRepository.save(user);
     }
 
     @Override
     public RoleResponse getRole(Integer id) {
-        return null;
+        Optional<Role> roleOptional = roleRepository.findById(id);
+
+        if(roleOptional.isPresent()){
+            Role role = roleOptional.get();
+            RoleResponse response = mapper.fromRoleResponse(role);
+
+            return  response;
+        }else{
+        throw new RoleNotFoundException("Role not found.");
+        }
     }
 
     @Override
     public void deleteRole(Integer id) {
-
+    roleRepository.deleteById(id);
     }
 }

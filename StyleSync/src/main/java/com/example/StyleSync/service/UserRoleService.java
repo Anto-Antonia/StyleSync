@@ -5,6 +5,7 @@ import com.example.StyleSync.dto.request.user.UserRequest;
 import com.example.StyleSync.dto.request.user.UserUpdateUsername;
 import com.example.StyleSync.dto.response.role.RoleResponse;
 import com.example.StyleSync.dto.response.user.UserResponse;
+import com.example.StyleSync.entity.Role;
 
 import java.util.List;
 
@@ -14,8 +15,10 @@ public interface UserRoleService {
     List<UserResponse> getAllUsers();
     void updateUserUsername(Integer id, UserUpdateUsername userUpdateUsername);
     void addItemToFavorite(Integer userId, Integer itemId);
+    void removeItemFromFavorite(Integer userId, Integer itemId);
     void deleteUser(Integer id);
-    RoleResponse addRole(RoleRequest request);
+    Role addRole(RoleRequest request);
+    void addRoleToUser(Integer userId, String name);
     RoleResponse getRole(Integer id);
     void deleteRole(Integer id);
 }
