@@ -151,7 +151,7 @@ public class UserRoleServiceImpl implements UserRoleService{
             RoleResponse response = mapper.fromRoleResponse(role);
 
             return  response;
-        }else{
+        } else{
         throw new RoleNotFoundException("Role not found.");
         }
     }
