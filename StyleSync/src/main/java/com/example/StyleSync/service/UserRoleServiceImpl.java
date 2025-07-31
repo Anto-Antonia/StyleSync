@@ -3,6 +3,7 @@ package com.example.StyleSync.service;
 import com.example.StyleSync.dto.request.role.RoleRequest;
 import com.example.StyleSync.dto.request.user.UserRequest;
 import com.example.StyleSync.dto.request.user.UserUpdateUsername;
+import com.example.StyleSync.dto.response.product.FavoriteProductResponse;
 import com.example.StyleSync.dto.response.role.RoleResponse;
 import com.example.StyleSync.dto.response.user.UserResponse;
 import com.example.StyleSync.entity.Product;
@@ -19,6 +20,7 @@ import com.example.StyleSync.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -116,6 +118,21 @@ public class UserRoleServiceImpl implements UserRoleService{
             user.getFavoriteProducts().remove(product);
             userRepository.save(user);
         }
+    }
+
+    @Override
+    public List<FavoriteProductResponse> getFavoriteProducts(Integer userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            List<Product> favorites = user.getFavoriteProducts();
+
+            return favorites.stream()
+                    .map(p -> new FavoriteProductResponse(p.getProductName(), p.getPrice(), p.getQuantity()))
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
 
