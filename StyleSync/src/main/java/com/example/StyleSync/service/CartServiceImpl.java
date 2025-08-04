@@ -5,12 +5,16 @@ import com.example.StyleSync.entity.Cart;
 import com.example.StyleSync.entity.CartItem;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.entity.User;
+import com.example.StyleSync.exceptions.product.ProductNotFoundException;
+import com.example.StyleSync.exceptions.user.UserNotFoundException;
+import com.example.StyleSync.mapper.Cart_CartItemMapper;
 import com.example.StyleSync.mapper.ProductMapper;
 import com.example.StyleSync.repository.CartItemRepository;
 import com.example.StyleSync.repository.CartRepository;
 import com.example.StyleSync.repository.ProductRepository;
 import com.example.StyleSync.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -21,14 +25,15 @@ public class CartServiceImpl implements CartService{
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
-    private final ProductMapper mapper;
+    private final Cart_CartItemMapper mapper;
 
-    public CartServiceImpl(ProductRepository productRepository, CartRepository cartRepository, CartItemRepository cartItemRepository, UserRepository userRepository, ProductMapper mapper) {
+    public CartServiceImpl(ProductRepository productRepository, CartRepository cartRepository, CartItemRepository cartItemRepository, UserRepository userRepository, ProductMapper mapper, Cart_CartItemMapper mapper1) {
         this.productRepository = productRepository;
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.userRepository = userRepository;
-        this.mapper = mapper;
+
+        this.mapper = mapper1;
     }
 
     @Override
@@ -61,6 +66,7 @@ public class CartServiceImpl implements CartService{
         cartRepository.save(cart);
     }
 
+    @Transactional
     @Override
     public void removeProductFromCart(Integer userId, Integer productId) {
     User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found"));
@@ -81,16 +87,51 @@ public class CartServiceImpl implements CartService{
 
     @Override
     public void updateProductQuantity(Integer userId, Integer productId, int newQuantity) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new UserNotFoundException("User not found."));
+        Cart cart = user.getCart();
+        if(cart == null || cart.getItems() == null){
+            throw new RuntimeException("The cart is empty");
+        }
 
+        CartItem cartItem = cart.getItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElseThrow(()-> new ProductNotFoundException("Product not found in cart."));
+
+        if(newQuantity <= 0){
+            cart.getItems().remove(cartItem);
+            cartItemRepository.delete(cartItem);
+        } else{
+            cartItem.setQuantity(newQuantity);
+        }
+
+        cartRepository.save(cart);
     }
 
     @Override
-    public CartResponse getUserCat(Integer userId) {
-        return null;
+    public CartResponse getUserCart(Integer userId) {
+        User user = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found exception."));
+
+        Cart cart = user.getCart();
+        if(cart == null || cart.getItems() == null || cart.getItems().isEmpty()){
+            throw new RuntimeException("Cart is empty.");
+        }
+
+      return mapper.toCartResponse(cart);
     }
 
     @Override
     public void clearCart(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new UserNotFoundException("User not found."));
 
+        Cart cart = user.getCart();
+        if(cart == null || cart.getItems() == null || cart.getItems().isEmpty()){
+            throw new RuntimeException("Cart is already empty.");
+        }
+
+        cart.getItems().clear(); // removing the items from memory
+        cartRepository.save(cart);
     }
 }

@@ -6,6 +6,6 @@ public interface CartService {
     void addItemToCart(Integer userId, Integer productId, int quantity);
     void removeProductFromCart(Integer userId, Integer productId);
     void updateProductQuantity(Integer userId, Integer productId, int newQuantity);
-    CartResponse getUserCat(Integer userId);
+    CartResponse getUserCart(Integer userId);
     void clearCart(Integer userId);
 }
