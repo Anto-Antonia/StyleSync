@@ -50,7 +50,7 @@ public class Order_OrderItemMapper {
         return order;
     }
 
-    public OrderResponse toOrderResponse(Order order){ // gonna finish this method later
+    public OrderResponse toOrderResponse(Order order){
         OrderResponse response = new OrderResponse();
 
        //response.setId(order.get);
