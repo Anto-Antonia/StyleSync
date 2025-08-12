@@ -6,7 +6,7 @@ import com.example.StyleSync.entity.ShippingAddress;
 
 public interface ShippingAddressService {
     ShippingAddress addAddress(Integer userId, ShippingAddressRequest shippingAddressRequest);
-    void updateAddress(Integer addressId, ShippingAddressRequest shippingAddressRequest);
-    void deleteAddress(Integer addressId);
+    void updateAddress(Long orderId, ShippingAddressRequest shippingAddressRequest);
+    void deleteAddress(Long orderId);
     ShippingAddressResponse getUserAddress(Integer userId);
 }

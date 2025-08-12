@@ -33,6 +33,7 @@ public class UserRoleServiceImpl implements UserRoleService{
     private static ProductRepository productRepository;
     private static UserRoleMapper mapper;
 
+
     @Override
     public UserResponse addUser(UserRequest userRequest) {
         Optional<User> existingUser = userRepository.findUserByEmail(userRequest.getEmail());
@@ -73,10 +74,9 @@ public class UserRoleServiceImpl implements UserRoleService{
     @Override
     public List<UserResponse> getAllUsers() {
         List<User> user = userRepository.findAll();
-        List<UserResponse> responses = user.stream()
-                .map(element -> mapper.fromUserResponse(element)).collect(Collectors.toList());
 
-        return responses;
+        return user.stream()
+                .map(element -> mapper.fromUserResponse(element)).collect(Collectors.toList());
     }
 
     @Override
@@ -165,9 +165,8 @@ public class UserRoleServiceImpl implements UserRoleService{
 
         if(roleOptional.isPresent()){
             Role role = roleOptional.get();
-            RoleResponse response = mapper.fromRoleResponse(role);
 
-            return  response;
+            return  mapper.fromRoleResponse(role);
         } else{
         throw new RoleNotFoundException("Role not found.");
         }

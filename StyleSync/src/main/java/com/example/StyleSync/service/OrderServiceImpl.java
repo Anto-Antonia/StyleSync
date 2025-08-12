@@ -2,13 +2,12 @@ package com.example.StyleSync.service;
 
 import com.example.StyleSync.dto.request.order.OrderRequest;
 import com.example.StyleSync.dto.response.order.OrderResponse;
-import com.example.StyleSync.dto.response.user.UserResponse;
 import com.example.StyleSync.entity.Order;
+import com.example.StyleSync.entity.OrderStatus;
 import com.example.StyleSync.entity.User;
 import com.example.StyleSync.exceptions.order.OrderNotFoundException;
 import com.example.StyleSync.exceptions.user.UserNotFoundException;
 import com.example.StyleSync.mapper.Order_OrderItemMapper;
-import com.example.StyleSync.repository.CartRepository;
 import com.example.StyleSync.repository.OrderRepository;
 import com.example.StyleSync.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -21,14 +20,12 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
-    private final CartRepository cartRepository;
     private final CartServiceImpl cartService;
     private final Order_OrderItemMapper mapper;
 
-    public OrderServiceImpl(UserRepository userRepository, OrderRepository orderRepository, CartRepository cartRepository, CartServiceImpl cartService, Order_OrderItemMapper mapper) {
+    public OrderServiceImpl(UserRepository userRepository, OrderRepository orderRepository, CartServiceImpl cartService, Order_OrderItemMapper mapper) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
-        this.cartRepository = cartRepository;
         this.cartService = cartService;
         this.mapper = mapper;
     }
@@ -61,12 +58,19 @@ public class OrderServiceImpl implements OrderService {
 
         if(orders.isPresent()){
             Order order = orders.get();
-            OrderResponse response = mapper.toOrderResponse(order);
 
-            return response;
+            return mapper.toOrderResponse(order);
         } else{
             throw new OrderNotFoundException("Order with id " + orderId + " not found");
         }
+    }
 
+    @Override
+    public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(()-> new OrderNotFoundException("Order not found"));
+
+        order.setStatus(newStatus);
+        orderRepository.save(order);
     }
 }
