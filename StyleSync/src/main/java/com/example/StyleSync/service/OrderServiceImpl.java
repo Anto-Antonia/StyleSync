@@ -2,8 +2,10 @@ package com.example.StyleSync.service;
 
 import com.example.StyleSync.dto.request.order.OrderRequest;
 import com.example.StyleSync.dto.response.order.OrderResponse;
+import com.example.StyleSync.dto.response.user.UserResponse;
 import com.example.StyleSync.entity.Order;
 import com.example.StyleSync.entity.User;
+import com.example.StyleSync.exceptions.order.OrderNotFoundException;
 import com.example.StyleSync.exceptions.user.UserNotFoundException;
 import com.example.StyleSync.mapper.Order_OrderItemMapper;
 import com.example.StyleSync.repository.CartRepository;
@@ -12,6 +14,8 @@ import com.example.StyleSync.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -44,11 +48,25 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponse> getUserOrders(Integer userId) {
-        return null;
+        User user = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found."));
+
+        List<Order> orders = user.getOrders();
+
+        return orders.stream().map(mapper::toOrderResponse).collect(Collectors.toList());
     }
 
     @Override
-    public OrderResponse getOrderById(Integer orderId) {
-        return null;
+    public OrderResponse getOrderById(Long orderId) {
+        Optional<Order> orders = orderRepository.findById(orderId);
+
+        if(orders.isPresent()){
+            Order order = orders.get();
+            OrderResponse response = mapper.toOrderResponse(order);
+
+            return response;
+        } else{
+            throw new OrderNotFoundException("Order with id " + orderId + " not found");
+        }
+
     }
 }
