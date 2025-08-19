@@ -3,14 +3,18 @@ package com.example.StyleSync.mapper;
 import com.example.StyleSync.dto.request.role.RoleRequest;
 import com.example.StyleSync.dto.request.user.UserRequest;
 import com.example.StyleSync.dto.response.role.RoleResponse;
+import com.example.StyleSync.dto.response.user.SignInResponse;
 import com.example.StyleSync.dto.response.user.UserResponse;
 import com.example.StyleSync.entity.Role;
 import com.example.StyleSync.entity.User;
+import com.example.StyleSync.service.security.UserDetailsImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserRoleMapper {
@@ -53,5 +57,17 @@ public class UserRoleMapper {
         response.setRoleName(role.getName());
 
         return response;
+    }
+
+    public static SignInResponse fromUserDetailsImpl(UserDetailsImpl userDetails){
+        SignInResponse signInResponse = new SignInResponse();
+
+        signInResponse.setFirstName(userDetails.getFirstName());
+        signInResponse.setEmail(userDetails.getUsername());
+
+        List<String> roles = userDetails.getAuthorities()
+                .stream().map(grantedAuthority -> grantedAuthority.getAuthority()).collect(Collectors.toList());
+        signInResponse.setRoleName(roles);
+        return signInResponse;
     }
 }
