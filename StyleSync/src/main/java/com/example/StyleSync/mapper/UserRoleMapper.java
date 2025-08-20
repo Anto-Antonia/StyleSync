@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserRoleMapper {
-   // private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // for when working with the registrations and all
+    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // for when working with the registrations and all
 
     public User fromUserRequest(UserRequest userRequest){
         User user = new User();
