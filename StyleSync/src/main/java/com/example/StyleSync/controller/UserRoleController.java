@@ -29,7 +29,7 @@ public class UserRoleController {
     }
 
     @PostMapping("/addUser")
-    @PreAuthorize("hasRol('admin')")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest userRequest){
         UserResponse response = service.addUser(userRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -61,7 +61,7 @@ public class UserRoleController {
         return ResponseEntity.ok("Item added to favorites");
     }
 
-    @PostMapping("/{userId}/removeItem/{itemId}")
+    @DeleteMapping("/{userId}/removeItem/{itemId}")
     public ResponseEntity<String> removeItemFromFavorite(@PathVariable Integer userId, @PathVariable Integer itemId){
         service.removeItemFromFavorite(userId, itemId);
         return ResponseEntity.ok("Item removed from favorites");
@@ -77,10 +77,10 @@ public class UserRoleController {
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> deleteUser(@PathVariable Integer userId){
         service.deleteUser(userId);
-        return ResponseEntity.ok("User with the id: " + userId + "has been deleted");
+        return ResponseEntity.ok("User with the id: " + userId + " has been deleted");
     }
 
-    @PostMapping("/addRole")
+    @PostMapping("/role/addRole")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Role> addRole(@RequestBody RoleRequest request){
         Role role = service.addRole(request);
@@ -93,7 +93,7 @@ public class UserRoleController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("role")
+    @GetMapping("/role/{id}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<RoleResponse> getRole(@PathVariable Integer id){
         RoleResponse response = service.getRole(id);
