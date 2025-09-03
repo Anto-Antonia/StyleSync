@@ -6,6 +6,7 @@ import com.example.StyleSync.service.OrderServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,9 +18,10 @@ public class OrderController {
         this.service = service;
     }
 
-    @PostMapping("{/userId}")
-    public ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest request, @Valid @RequestParam Integer userId){
-        OrderResponse response = service.placeOrder(request, userId);
+    @PostMapping("/{userId}")
+    public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest request, Authentication authentication){
+        String email = authentication.getName();
+        OrderResponse response = service.placeOrder(request, email);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

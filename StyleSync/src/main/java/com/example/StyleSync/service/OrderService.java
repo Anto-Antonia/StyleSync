@@ -7,7 +7,7 @@ import com.example.StyleSync.entity.OrderStatus;
 import java.util.List;
 
 public interface OrderService {
-    OrderResponse placeOrder(OrderRequest orderRequest, Integer userId);
+    OrderResponse placeOrder(OrderRequest orderRequest, String email);
     List<OrderResponse> getUserOrders(Integer userId);
     OrderResponse getOrderById(Long orderId);
     void updateOrderStatus(Long orderId, OrderStatus newStatus);

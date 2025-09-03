@@ -32,8 +32,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse placeOrder(OrderRequest orderRequest, Integer userId) {
-        User user = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found."));
+    public OrderResponse placeOrder(OrderRequest orderRequest, String email) {
+        User user = userRepository.findUserByEmail(email)
+                .orElseThrow(()-> new UserNotFoundException("User not found."));
 
         Order order = mapper.fromOrderRequest(orderRequest);
         order.setUser(user);
@@ -42,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderRepository.save(order);
 
-        cartService.clearCart(userId);
+        cartService.clearCart(email);
         return mapper.toOrderResponse(order);
     }
 

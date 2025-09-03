@@ -7,5 +7,5 @@ public interface CartService {
     void removeProductFromCart(Integer userId, Integer productId);
     void updateProductQuantity(Integer userId, Integer productId, int newQuantity);
     CartResponse getUserCart(Integer userId);
-    void clearCart(Integer userId);
+    void clearCart(String email);
 }

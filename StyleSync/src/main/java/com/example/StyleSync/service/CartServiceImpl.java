@@ -5,6 +5,7 @@ import com.example.StyleSync.entity.Cart;
 import com.example.StyleSync.entity.CartItem;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.entity.User;
+import com.example.StyleSync.exceptions.cart.CartIsAlreadyEmpty;
 import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.exceptions.user.UserNotFoundException;
 import com.example.StyleSync.mapper.Cart_CartItemMapper;
@@ -122,13 +123,13 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    public void clearCart(Integer userId) {
-        User user = userRepository.findById(userId)
+    public void clearCart(String email) {
+        User user = userRepository.findUserByEmail(email)
                 .orElseThrow(()-> new UserNotFoundException("User not found."));
 
         Cart cart = user.getCart();
         if(cart == null || cart.getItems() == null || cart.getItems().isEmpty()){
-            throw new RuntimeException("Cart is already empty.");
+            throw new CartIsAlreadyEmpty("Cart is already empty.");
         }
 
         cart.getItems().clear(); // removing the items from memory
