@@ -6,7 +6,6 @@ import com.example.StyleSync.dto.response.product.ProductResponse;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.service.ProductService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -9,8 +9,6 @@ import com.example.StyleSync.dto.response.user.UserResponse;
 import com.example.StyleSync.entity.Role;
 import com.example.StyleSync.service.UserRoleService;
 import jakarta.validation.Valid;
-import lombok.Getter;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

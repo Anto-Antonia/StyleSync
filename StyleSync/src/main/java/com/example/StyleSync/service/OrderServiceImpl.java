@@ -12,6 +12,7 @@ import com.example.StyleSync.repository.OrderRepository;
 import com.example.StyleSync.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +37,8 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = mapper.fromOrderRequest(orderRequest);
         order.setUser(user);
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus(OrderStatus.PENDING);
 
         orderRepository.save(order);
 

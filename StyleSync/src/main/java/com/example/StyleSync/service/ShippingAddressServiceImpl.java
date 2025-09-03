@@ -9,6 +9,7 @@ import com.example.StyleSync.exceptions.user.UserNotFoundException;
 import com.example.StyleSync.mapper.ShippingAddressMapper;
 import com.example.StyleSync.repository.OrderRepository;
 import com.example.StyleSync.repository.UserRepository;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,23 +25,23 @@ public class ShippingAddressServiceImpl implements ShippingAddressService {
         this.mapper = mapper;
     }
 
-    @Override
-    public ShippingAddress addAddress(Integer userId, ShippingAddressRequest shippingAddressRequest) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(()->new UserNotFoundException("User with id " + userId + " not found."));
-
-        ShippingAddress address = mapper.fromShippingAddressRequest(shippingAddressRequest);
-
-        Order order = new Order();
-        order.setUser(user);
-        order.setShippingAddress(address);
-        order.setOrderDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.PENDING);
-        order.setPaymentMethod(PaymentMethod.PAYPAL);
-
-        orderRepository.save(order);
-        return address;
-    }
+//    @Override
+//    public ShippingAddressResponse addAddress(String email, ShippingAddressRequest shippingAddressRequest) {
+//        User user = userRepository.findUserByEmail(email)
+//                .orElseThrow(()->new UserNotFoundException("User not found"));
+//
+//        ShippingAddress address = mapper.fromShippingAddressRequest(shippingAddressRequest);
+//
+//        Order order = new Order();
+//        order.setUser(user);
+//        order.setShippingAddress(address);
+//        order.setOrderDate(LocalDateTime.now());
+//        order.setStatus(OrderStatus.PENDING);
+//        order.setPaymentMethod(PaymentMethod.PAYPAL);
+//
+//        orderRepository.save(order);
+//        return address;
+//    }
 
     @Override
     public void updateAddress(Long orderId, ShippingAddressRequest shippingAddressRequest) {
