@@ -57,6 +57,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<OrderResponse> getMyOrders(String email) {
+        User user = userRepository.findUserByEmail(email)
+                .orElseThrow(()-> new UserNotFoundException("User not found."));
+
+        List<Order> orders = user.getOrders();
+
+        return orders.stream().map(mapper::toOrderResponse).collect(Collectors.toList());
+    }
+
+    @Override
     public OrderResponse getOrderById(Long orderId) {
         Optional<Order> orders = orderRepository.findById(orderId);
 
@@ -70,11 +80,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void updateOrderStatus(Long orderId, OrderStatus newStatus) {
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(()-> new OrderNotFoundException("Order not found"));
 
         order.setStatus(newStatus);
         orderRepository.save(order);
+
+        return mapper.toOrderResponse(order);
     }
 }
