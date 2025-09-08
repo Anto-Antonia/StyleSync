@@ -3,7 +3,6 @@ package com.example.StyleSync.controller;
 import com.example.StyleSync.dto.request.order.OrderRequest;
 import com.example.StyleSync.dto.request.order.UpdateOrderStatusRequest;
 import com.example.StyleSync.dto.response.order.OrderResponse;
-import com.example.StyleSync.entity.OrderStatus;
 import com.example.StyleSync.service.OrderServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
