@@ -75,8 +75,8 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(encodedPassword);
 
-        Role defaultRole = roleRepository.findRoleByName("user")
-                .orElseThrow(()-> new RoleNotFoundException("Default role 'user' not found."));
+        Role defaultRole = roleRepository.findRoleByName("ROLE_USER")
+                .orElseThrow(()-> new RoleNotFoundException("Default role 'ROLE_USER' not found."));
 
         user.setRole(defaultRole);
 
