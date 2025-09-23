@@ -1,6 +1,7 @@
 package com.example.StyleSync.configuration;
 
 import com.example.StyleSync.jwt.JwtFilter;
+import com.example.StyleSync.service.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,9 +21,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public SecurityConfig(JwtFilter jwtFilter) {
+    public SecurityConfig(JwtFilter jwtFilter, CustomUserDetailsService customUserDetailsService) {
         this.jwtFilter = jwtFilter;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Bean

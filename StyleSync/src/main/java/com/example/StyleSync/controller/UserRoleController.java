@@ -86,6 +86,7 @@ public class UserRoleController {
     }
 
     @PostMapping("/role/addRoleToUser/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> addRoleToUser(@PathVariable @Valid Integer userId, @RequestBody String name){
         service.addRoleToUser(userId, name);
         return ResponseEntity.ok().build();

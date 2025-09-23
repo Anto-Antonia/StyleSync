@@ -13,4 +13,5 @@ public class SignInResponse {
     private String firstName;
     private String email;
     private List<String> roleName;
+    private String token;
 }

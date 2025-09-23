@@ -4,6 +4,7 @@ import com.example.StyleSync.dto.request.user.RegisterRequest;
 import com.example.StyleSync.dto.request.user.SignInRequest;
 import com.example.StyleSync.dto.response.user.RegisterResponse;
 import com.example.StyleSync.dto.response.user.SignInResponse;
+import com.example.StyleSync.jwt.JwtUtils;
 import com.example.StyleSync.service.security.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
 
-    public AuthController(AuthService authService, AuthenticationManager authenticationManager) {
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
         this.authService = authService;
         this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
     }
 
     @PostMapping("/api/auth/signIn")

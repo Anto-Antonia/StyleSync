@@ -9,7 +9,7 @@ import com.example.StyleSync.entity.User;
 import com.example.StyleSync.exceptions.auth.InvalidPasswordException;
 import com.example.StyleSync.exceptions.role.RoleNotFoundException;
 import com.example.StyleSync.exceptions.user.EmailAlreadyExistsException;
-import com.example.StyleSync.exceptions.user.UserNotFoundException;
+import com.example.StyleSync.jwt.JwtUtils;
 import com.example.StyleSync.mapper.UserRoleMapper;
 import com.example.StyleSync.repository.RoleRepository;
 import com.example.StyleSync.repository.UserRepository;
@@ -28,12 +28,14 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
-    public AuthService(UserRepository userRepository, RoleRepository roleRepository, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, RoleRepository roleRepository, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
     }
 
     public void checkEmailAvailable(String email){
@@ -70,6 +72,7 @@ public class AuthService {
 
         User user = new User();
         user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -104,7 +107,9 @@ public class AuthService {
 
             UserDetailsImpl userDetails = UserDetailsImpl.build(user);
 
-            return UserRoleMapper.fromUserDetailsImpl(userDetails);
+            String token = jwtUtils.generateToken(userDetails.getUsername());
+
+            return UserRoleMapper.fromUserDetailsImpl(userDetails, token);
         } catch(AuthenticationException e){
             throw new BadCredentialsException("Invalid email or password");
         }

@@ -59,7 +59,7 @@ public class UserRoleMapper {
         return response;
     }
 
-    public static SignInResponse fromUserDetailsImpl(UserDetailsImpl userDetails){
+    public static SignInResponse fromUserDetailsImpl(UserDetailsImpl userDetails, String token){
         SignInResponse signInResponse = new SignInResponse();
 
         signInResponse.setFirstName(userDetails.getFirstName());
@@ -68,6 +68,8 @@ public class UserRoleMapper {
         List<String> roles = userDetails.getAuthorities()
                 .stream().map(grantedAuthority -> grantedAuthority.getAuthority()).collect(Collectors.toList());
         signInResponse.setRoleName(roles);
+
+        signInResponse.setToken(token);
         return signInResponse;
     }
 }
