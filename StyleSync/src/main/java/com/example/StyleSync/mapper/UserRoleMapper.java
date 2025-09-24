@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserRoleMapper {
-    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // for when working with the registrations and all
+    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User fromUserRequest(UserRequest userRequest){
         User user = new User();
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
         user.setEmail(userRequest.getEmail());
-        //user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
         return user;
     }
@@ -45,7 +45,7 @@ public class UserRoleMapper {
     public Role fromRoleRequest(RoleRequest request){
         Role role = new Role();
 
-        role.setName(request.getName());
+        role.setName(request.getRoleName());
         role.setUsers(new ArrayList<>());
 
         return role;

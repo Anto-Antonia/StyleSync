@@ -27,21 +27,21 @@ public class UserRoleController {
     }
 
     @PostMapping("/addUser")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest userRequest){
         UserResponse response = service.addUser(userRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Integer id){
         UserResponse response = service.getUserById(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers(){
         List<UserResponse> responses = service.getAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(responses);
@@ -72,14 +72,14 @@ public class UserRoleController {
     }
 
     @DeleteMapping("/{userId}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable Integer userId){
         service.deleteUser(userId);
         return ResponseEntity.ok("User with the id: " + userId + " has been deleted");
     }
 
     @PostMapping("/role/addRole")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Role> addRole(@RequestBody RoleRequest request){
         Role role = service.addRole(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(role);
@@ -87,8 +87,8 @@ public class UserRoleController {
 
     @PostMapping("/role/addRoleToUser/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> addRoleToUser(@PathVariable @Valid Integer userId, @RequestBody String name){
-        service.addRoleToUser(userId, name);
+    public ResponseEntity<Void> addRoleToUser(@PathVariable @Valid Integer userId, @RequestBody RoleRequest request){
+        service.addRoleToUser(userId, request.getRoleName());
         return ResponseEntity.ok().build();
     }
 

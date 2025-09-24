@@ -28,11 +28,17 @@ import java.util.stream.Collectors;
 @Service
 public class UserRoleServiceImpl implements UserRoleService{
 
-    private static UserRepository userRepository;
-    private static RoleRepository roleRepository;
-    private static ProductRepository productRepository;
-    private static UserRoleMapper mapper;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final ProductRepository productRepository;
+    private final UserRoleMapper mapper;
 
+    public UserRoleServiceImpl(UserRepository userRepository, RoleRepository roleRepository, ProductRepository productRepository, UserRoleMapper mapper) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.productRepository = productRepository;
+        this.mapper = mapper;
+    }
 
     @Override
     public UserResponse addUser(UserRequest userRequest) {
@@ -41,18 +47,19 @@ public class UserRoleServiceImpl implements UserRoleService{
             throw new EmailAlreadyExistsException("Email already in use: " + userRequest.getEmail());
         }
 
-        User user = new User();
-        user.setFirstName(userRequest.getFirstName());
-        user.setLastName(userRequest.getLastName());
-        user.setEmail(userRequest.getEmail());
-        user.setPassword(userRequest.getPassword());
+        User user = mapper.fromUserRequest(userRequest);
+//        User user = new User();
+//        user.setFirstName(userRequest.getFirstName());
+//        user.setLastName(userRequest.getLastName());
+//        user.setEmail(userRequest.getEmail());
+//        user.setPassword(userRequest.getPassword());
 
-        Role role = roleRepository.findRoleByName("user")
+        Role role = roleRepository.findRoleByName("ROLE_USER")
                 .orElseThrow(()-> new RoleNotFoundException("Role 'user' not found in DB"));
 
-        user.setRole(role);
+       user.setRole(role);
 
-        userRepository.save(user);
+       userRepository.save(user);
 
         return new UserResponse(
                 user.getId(),

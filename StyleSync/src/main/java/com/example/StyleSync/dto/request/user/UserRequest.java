@@ -1,7 +1,5 @@
 package com.example.StyleSync.dto.request.user;
 
-import com.example.StyleSync.entity.Cart;
-import com.example.StyleSync.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

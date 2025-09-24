@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 public class RoleRequest {
 
     @NotBlank(message = "The role must not be empty")
-    private String name;
+    private String roleName;
 }
