@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserUpdateUsername {
-    String firstname;
-    String lastname;
+    String firstName;
+    String lastName;
 }

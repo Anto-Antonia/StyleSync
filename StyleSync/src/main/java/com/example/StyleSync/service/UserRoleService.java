@@ -15,7 +15,8 @@ public interface UserRoleService {
     UserResponse addUser(UserRequest userRequest);
     UserResponse getUserById(Integer id);
     List<UserResponse> getAllUsers();
-    void updateUserUsername(Integer id, UserUpdateUsername userUpdateUsername);
+    UserResponse getUserByEmail(String email);
+    void updateUserUsername(String email, UserUpdateUsername userUpdateUsername);
     void addItemToFavorite(Integer userId, Integer itemId);
     void removeItemFromFavorite(Integer userId, Integer itemId);
     List<FavoriteProductResponse> getFavoriteProducts(Integer userId);

@@ -17,6 +17,7 @@ import com.example.StyleSync.mapper.UserRoleMapper;
 import com.example.StyleSync.repository.ProductRepository;
 import com.example.StyleSync.repository.RoleRepository;
 import com.example.StyleSync.repository.UserRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,11 +49,6 @@ public class UserRoleServiceImpl implements UserRoleService{
         }
 
         User user = mapper.fromUserRequest(userRequest);
-//        User user = new User();
-//        user.setFirstName(userRequest.getFirstName());
-//        user.setLastName(userRequest.getLastName());
-//        user.setEmail(userRequest.getEmail());
-//        user.setPassword(userRequest.getPassword());
 
         Role role = roleRepository.findRoleByName("ROLE_USER")
                 .orElseThrow(()-> new RoleNotFoundException("Role 'user' not found in DB"));
@@ -83,20 +79,32 @@ public class UserRoleServiceImpl implements UserRoleService{
         List<User> user = userRepository.findAll();
 
         return user.stream()
-                .map(element -> mapper.fromUserResponse(element)).collect(Collectors.toList());
+                .map(mapper::fromUserResponse).collect(Collectors.toList());
     }
 
     @Override
-    public void updateUserUsername(Integer id, UserUpdateUsername userUpdateUsername) {
-        Optional<User> optionalUser = userRepository.findById(id);
+    public UserResponse getUserByEmail(String email) {
+        User user = userRepository.findUserByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found."));
 
-        if(optionalUser.isPresent()){
-            User user = optionalUser.get();
-            user.setFirstName(userUpdateUsername.getFirstname());
-            user.setLastName(userUpdateUsername.getLastname());
-            userRepository.save(user);
+        return new UserResponse(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail()
+        );
+    }
+
+    @Override
+    public void updateUserUsername(String email, UserUpdateUsername userUpdateUsername) {
+        Optional<User> userOpt = userRepository.findUserByEmail(email);
+
+        if(userOpt.isPresent()){
+            User user1 = userOpt.get();
+            user1.setFirstName(userUpdateUsername.getFirstName());
+            user1.setLastName(userUpdateUsername.getLastName());
+            userRepository.save(user1);
         } else{
-            throw new UserNotFoundException("The user with id: " + id + " was not found");
+            throw new UserNotFoundException("User not found.");
         }
     }
 

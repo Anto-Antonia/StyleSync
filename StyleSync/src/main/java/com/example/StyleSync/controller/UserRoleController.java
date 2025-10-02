@@ -12,6 +12,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,6 +42,16 @@ public class UserRoleController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserResponse> getUserProfile(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        UserResponse response = service.getUserByEmail(email);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers(){
@@ -47,9 +59,13 @@ public class UserRoleController {
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Void> updateUserUsername(@PathVariable Integer id, @RequestBody @Valid UserUpdateUsername userUpdateUsername ){
-        service.updateUserUsername(id, userUpdateUsername);
+    @PatchMapping("/updateUsername")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> updateUserUsername(@RequestBody @Valid UserUpdateUsername userUpdateUsername ){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        service.updateUserUsername(email, userUpdateUsername);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
