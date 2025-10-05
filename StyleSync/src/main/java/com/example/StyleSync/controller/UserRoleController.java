@@ -69,21 +69,33 @@ public class UserRoleController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PostMapping("/{userId}/addToFav/{itemId}")
-    public ResponseEntity<String> addItemToFavorite(@PathVariable Integer userId, @PathVariable Integer itemId){
-        service.addItemToFavorite(userId, itemId);
+    @PostMapping("/addToFav/{itemId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> addItemToFavorite( @PathVariable Integer itemId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        service.addItemToFavorite(email, itemId);
         return ResponseEntity.ok("Item added to favorites");
     }
 
-    @DeleteMapping("/{userId}/removeItem/{itemId}")
-    public ResponseEntity<String> removeItemFromFavorite(@PathVariable Integer userId, @PathVariable Integer itemId){
-        service.removeItemFromFavorite(userId, itemId);
-        return ResponseEntity.ok("Item removed from favorites");
+    @DeleteMapping("/removeItem/{itemId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> removeItemFromFavorite( @PathVariable Integer itemId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        service.removeItemFromFavorite(email, itemId);
+        return ResponseEntity.ok("Item removed from favorites successfully.");
     }
 
-    @GetMapping("/getFavProducts/{userId}")
-    public ResponseEntity<List<FavoriteProductResponse>> getFavoriteProducts(@PathVariable Integer userId){
-        List<FavoriteProductResponse> responses = service.getFavoriteProducts(userId);
+    @GetMapping("/getFavProducts")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<FavoriteProductResponse>> getFavoriteProducts(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        List<FavoriteProductResponse> responses = service.getFavoriteProducts(email);
         return ResponseEntity.ok().body(responses);
     }
 
@@ -109,14 +121,14 @@ public class UserRoleController {
     }
 
     @GetMapping("/role/{id}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoleResponse> getRole(@PathVariable Integer id){
         RoleResponse response = service.getRole(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/role/{id}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteRole(@PathVariable @Valid Integer id){
         service.deleteRole(id);
         return ResponseEntity.ok("The role with id " + id + " has been deleted");

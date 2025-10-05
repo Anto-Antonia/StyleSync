@@ -109,9 +109,9 @@ public class UserRoleServiceImpl implements UserRoleService{
     }
 
     @Override
-    public void addItemToFavorite(Integer userId, Integer itemId) {
-    User user = userRepository.findById(userId)
-            .orElseThrow(()-> new UserNotFoundException("User not found!"));
+    public void addItemToFavorite(String email, Integer itemId) {
+    User user = userRepository.findUserByEmail(email)
+            .orElseThrow(()-> new UserNotFoundException("User not found."));
     Product product = productRepository.findById(itemId)
             .orElseThrow(()-> new ProductNotFoundException("Product not found."));
 
@@ -123,21 +123,21 @@ public class UserRoleServiceImpl implements UserRoleService{
 
     @Transactional
     @Override
-    public void removeItemFromFavorite(Integer userId, Integer itemId) {
-        User user = userRepository.findById(userId)
+    public void removeItemFromFavorite(String email, Integer itemId) {
+        User user = userRepository.findUserByEmail(email)
                 .orElseThrow(()-> new UserNotFoundException("User not found!"));
         Product product = productRepository.findById(itemId)
                 .orElseThrow(()-> new ProductNotFoundException("Product not found."));
 
-        if(!user.getFavoriteProducts().contains(product)){
+        if(user.getFavoriteProducts().contains(product)){
             user.getFavoriteProducts().remove(product);
             userRepository.save(user);
         }
     }
 
     @Override
-    public List<FavoriteProductResponse> getFavoriteProducts(Integer userId) {
-        Optional<User> optionalUser = userRepository.findById(userId);
+    public List<FavoriteProductResponse> getFavoriteProducts(String email) {
+        Optional<User> optionalUser = userRepository.findUserByEmail(email);
 
         if(optionalUser.isPresent()){
             User user = optionalUser.get();

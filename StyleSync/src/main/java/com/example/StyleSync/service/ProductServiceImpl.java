@@ -41,7 +41,7 @@ public class ProductServiceImpl implements ProductService{
     public List<ProductResponse> getAllProducts() {
         List<Product> product = productRepository.findAll();
         List<ProductResponse> responses = product.stream()
-                .map(element -> mapper.toProductResponse(element)).collect(Collectors.toList());
+                .map(mapper::toProductResponse).collect(Collectors.toList());
         return responses;
     }
 
@@ -52,7 +52,15 @@ public class ProductServiceImpl implements ProductService{
         if(optionalProduct.isPresent()){
             Product product1 = optionalProduct.get();
             product1.setProductName(updateProductRequest.getProductName());
+            product1.setPrice(updateProductRequest.getPrice());
+            product1.setQuantity(updateProductRequest.getQuantity());
+
+            productRepository.save(product1);
         }
+        else{
+            throw new ProductNotFoundException("Product with ID " + id + " not found.");
+        }
+
     }
 
     @Override

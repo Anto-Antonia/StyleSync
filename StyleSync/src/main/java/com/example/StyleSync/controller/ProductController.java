@@ -23,7 +23,7 @@ public class ProductController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Product> addProduct(@RequestBody ProductRequest productRequest){
         Product product = service.addProduct(productRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
@@ -43,7 +43,7 @@ public class ProductController {
     }
 
     @PatchMapping("/products/{id}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateProduct(@PathVariable Integer id, @RequestBody UpdateProductRequest updateProductRequest){
         service.updateProduct(id, updateProductRequest);
         return ResponseEntity.ok("The product has been updated.");
