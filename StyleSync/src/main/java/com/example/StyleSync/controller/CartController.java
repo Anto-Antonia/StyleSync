@@ -4,6 +4,7 @@ import com.example.StyleSync.dto.response.cart.CartResponse;
 import com.example.StyleSync.service.CartServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ public class CartController {
     }
 
     @PostMapping("/{productId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> addItemToCart(@PathVariable Integer productId, @RequestParam int quantity, Authentication authentication){
         String email = authentication.getName();
         service.addItemToCart(email, productId, quantity);
@@ -24,6 +26,7 @@ public class CartController {
     }
 
     @DeleteMapping("/removeItem/{productId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> removeProductFromCart(@PathVariable Integer productId, Authentication authentication){
         String email = authentication.getName();
         service.removeProductFromCart(email, productId);
@@ -31,6 +34,7 @@ public class CartController {
     }
 
     @PatchMapping("/{productId}/")
+    @PreAuthorize("isAuthenticated")
     public ResponseEntity<Void> updateProductQuantity(@PathVariable Integer productId, @RequestParam int newQuantity, Authentication authentication){
         String email = authentication.getName();
         service.updateProductQuantity(email, productId, newQuantity);
@@ -39,6 +43,7 @@ public class CartController {
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CartResponse> getUserCart(Authentication authentication){
         String email = authentication.getName();
         CartResponse response = service.getUserCart(email);

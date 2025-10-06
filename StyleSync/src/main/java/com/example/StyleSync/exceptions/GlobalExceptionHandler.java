@@ -14,14 +14,17 @@ import com.example.StyleSync.exceptions.user.EmailAlreadyExistsException;
 import com.example.StyleSync.exceptions.user.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.coyote.Response;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -38,6 +41,23 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .message(exception.getMessage())
                 .debugMessage((ExceptionUtils.getRootCauseMessage(exception)))
+                .path(request.getRequestURI())
+                .build();
+
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleValidationErrors(MethodArgumentNotValidException ex, HttpServletRequest request){
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        ApiError error = ApiError.builder()
+                .timeStamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST)
+                .message("Validation failed")
+                .debugMessage(errorMessage)
                 .path(request.getRequestURI())
                 .build();
 
@@ -166,6 +186,19 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_ACCEPTABLE)
                 .message(exception.getMessage())
                 .debugMessage((ExceptionUtils.getRootCauseMessage(exception)))
+                .path(request.getRequestURI())
+                .build();
+
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleAllExceptions(Exception ex, HttpServletRequest request){
+        ApiError error = ApiError.builder()
+                .timeStamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .message("An unexpected error has occurred.")
+                .debugMessage(ExceptionUtils.getRootCauseMessage(ex))
                 .path(request.getRequestURI())
                 .build();
 

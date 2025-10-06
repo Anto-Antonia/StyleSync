@@ -30,7 +30,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable @Valid Integer id){
         ProductResponse response = service.getProductById(id);
         return ResponseEntity.ok(response);
@@ -50,9 +50,9 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> removeProduct(@PathVariable @Valid Integer id){
         service.removeProduct(id);
-        return ResponseEntity.ok("The product with id " + id + "has been removed");
+        return ResponseEntity.ok("The product with id " + id + " has been removed");
     }
 }
