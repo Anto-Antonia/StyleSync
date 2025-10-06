@@ -10,6 +10,7 @@ import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.entity.Role;
 import com.example.StyleSync.entity.User;
 import com.example.StyleSync.exceptions.product.ProductNotFoundException;
+import com.example.StyleSync.exceptions.role.RoleAlreadyExistsException;
 import com.example.StyleSync.exceptions.role.RoleNotFoundException;
 import com.example.StyleSync.exceptions.user.EmailAlreadyExistsException;
 import com.example.StyleSync.exceptions.user.UserNotFoundException;
@@ -158,6 +159,11 @@ public class UserRoleServiceImpl implements UserRoleService{
 
     @Override
     public Role addRole(RoleRequest request) {
+        Optional<Role> existingRole = roleRepository.findRoleByName(request.getRoleName());
+        if(existingRole.isPresent()){
+            throw new RoleAlreadyExistsException("Role with name '" + request.getRoleName() + "' already exists");
+        }
+
         Role role = mapper.fromRoleRequest(request);
         return roleRepository.save(role);
     }
@@ -185,6 +191,14 @@ public class UserRoleServiceImpl implements UserRoleService{
         } else{
         throw new RoleNotFoundException("Role not found.");
         }
+    }
+
+    @Override
+    public List<RoleResponse> getAllRoles() {
+        List<Role> response = roleRepository.findAll();
+
+        return response.stream()
+                .map(mapper::fromRoleResponse).collect(Collectors.toList());
     }
 
     @Override

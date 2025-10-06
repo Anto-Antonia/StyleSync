@@ -127,6 +127,15 @@ public class UserRoleController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<RoleResponse>> getAllRoles(){
+        List<RoleResponse> response = service.getAllRoles();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
     @DeleteMapping("/role/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteRole(@PathVariable @Valid Integer id){

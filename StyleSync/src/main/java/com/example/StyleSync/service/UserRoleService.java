@@ -24,5 +24,6 @@ public interface UserRoleService {
     Role addRole(RoleRequest request);
     void addRoleToUser(Integer userId, String name);
     RoleResponse getRole(Integer id);
+    List<RoleResponse> getAllRoles();
     void deleteRole(Integer id);
 }
