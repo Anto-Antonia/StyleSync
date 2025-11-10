@@ -1,9 +1,7 @@
 package com.example.StyleSync.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +10,8 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "orders") // excluding fields what may cause circular references
+@EqualsAndHashCode(exclude = "orders")
 public class User {
 
     @Id

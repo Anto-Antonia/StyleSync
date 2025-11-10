@@ -1,5 +1,6 @@
 package com.example.StyleSync.exceptions;
 
+import com.example.StyleSync.exceptions.cart.CartIsAlreadyEmpty;
 import com.example.StyleSync.exceptions.cart.CartItemNotFoundException;
 import com.example.StyleSync.exceptions.cart.CartNotFoundException;
 import com.example.StyleSync.exceptions.cart.InvalidCartOperationException;
@@ -184,6 +185,19 @@ public class GlobalExceptionHandler {
         ApiError error = ApiError.builder()
                 .timeStamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_ACCEPTABLE)
+                .message(exception.getMessage())
+                .debugMessage((ExceptionUtils.getRootCauseMessage(exception)))
+                .path(request.getRequestURI())
+                .build();
+
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(CartIsAlreadyEmpty.class)
+    public ResponseEntity<Object> handleEmptyCartException(CartIsAlreadyEmpty exception, HttpServletRequest request){
+        ApiError error = ApiError.builder()
+                .timeStamp(LocalDateTime.now())
+                .status(HttpStatus.OK)
                 .message(exception.getMessage())
                 .debugMessage((ExceptionUtils.getRootCauseMessage(exception)))
                 .path(request.getRequestURI())

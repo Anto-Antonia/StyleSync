@@ -23,18 +23,18 @@ public class Order_OrderItemMapper {
         this.shippingAddressMapper = shippingAddressMapper;
     }
 
-    public Order fromOrderRequest(OrderRequest request){
+    public Order fromOrderRequest(OrderRequest request, User user, List<CartItem> cartItems){
         Order order = new Order();
         order.setOrderDate(LocalDateTime.now());
         order.setStatus(OrderStatus.PENDING);
         order.setPaymentMethod(request.getPaymentMethod());
         order.setShippingAddress(shippingAddressMapper.fromShippingAddressRequest(request.getShippingAddress()));
+        order.setUser(user);
 
-        List<OrderItem> orderItems =request.getItems().stream()
+        List<OrderItem> orderItems = cartItems.stream()
                 .map(itemRequest -> {
                     OrderItem orderItem = new OrderItem();
-                    Product product =productRepository.findById(itemRequest.getProductId())
-                            .orElseThrow(()-> new RuntimeException("Product not found."));
+                    Product product = itemRequest.getProduct();
 
                     orderItem.setProduct(product);
                     orderItem.setQuantity(itemRequest.getQuantity());
@@ -58,7 +58,7 @@ public class Order_OrderItemMapper {
         response.setPaymentMethod(order.getPaymentMethod());
         response.setStatus(order.getStatus());
 
-        ShippingAddress address = new ShippingAddress();
+        ShippingAddress address =order.getShippingAddress(); // using the actual address entered
         String addressAsString = String.format(
                 "%s, %s, %s, %s, %s, %s",
                 address.getFullName(),

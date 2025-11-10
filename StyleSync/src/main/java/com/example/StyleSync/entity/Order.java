@@ -1,9 +1,7 @@
 package com.example.StyleSync.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "orders")
+@ToString(exclude = "user")
+@EqualsAndHashCode(exclude = "user")
 public class Order {
 
     @Id
@@ -23,19 +23,19 @@ public class Order {
 
     private LocalDateTime orderDate;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> itemList = new ArrayList<>();
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
-    @Embedded
+    @Embedded()
     private ShippingAddress shippingAddress;
 }

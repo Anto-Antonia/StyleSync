@@ -34,7 +34,7 @@ public class CartController {
     }
 
     @PatchMapping("/{productId}/")
-    @PreAuthorize("isAuthenticated")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> updateProductQuantity(@PathVariable Integer productId, @RequestParam int newQuantity, Authentication authentication){
         String email = authentication.getName();
         service.updateProductQuantity(email, productId, newQuantity);

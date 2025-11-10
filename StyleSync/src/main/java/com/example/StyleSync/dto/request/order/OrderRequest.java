@@ -14,8 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderRequest {
 
-    @NotNull
-    private List<OrderItemRequest> items;
 
     @NotNull
     private PaymentMethod paymentMethod;

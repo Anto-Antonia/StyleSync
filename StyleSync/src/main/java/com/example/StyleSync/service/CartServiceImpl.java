@@ -120,7 +120,7 @@ public class CartServiceImpl implements CartService{
 
         Cart cart = user.getCart();
         if(cart == null || cart.getItems() == null || cart.getItems().isEmpty()){
-            throw new RuntimeException("Cart is empty.");
+            throw new CartIsAlreadyEmpty("Cart is empty.");
         }
 
       return mapper.toCartResponse(cart);

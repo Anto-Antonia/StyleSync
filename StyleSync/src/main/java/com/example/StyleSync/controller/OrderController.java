@@ -22,7 +22,8 @@ public class OrderController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping("/place_Order")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest request, Authentication authentication){
         String email = authentication.getName();
         OrderResponse response = service.placeOrder(request, email);
@@ -31,13 +32,14 @@ public class OrderController {
     }
 
     @GetMapping("/order/{userId}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderResponse>> getUserOrders (@PathVariable Integer userId){
         List<OrderResponse> responses = service.getUserOrders(userId);
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/my-orders")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<OrderResponse>> getMyOrders(Authentication authentication){
         String email = authentication.getName();
         List<OrderResponse> responses = service.getMyOrders(email);
@@ -46,14 +48,14 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId){
         OrderResponse response = service.getOrderById(orderId);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{orderId}/status")
-    @PreAuthorize("hasRole('admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse>updateOrderStatus(@PathVariable Long orderId, @Valid @RequestBody UpdateOrderStatusRequest newStatus){
         OrderResponse response = service.updateOrderStatus(orderId, newStatus.getStatus());
 
