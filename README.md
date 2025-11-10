@@ -25,7 +25,7 @@ Designed for scalability, clarity and seamless integration with frontend clients
 | Build Tool | Maven                   |
 
 
-# Instalation
+# Installation
 
 ``git clone https://github.com/Anto-Antonia/StyleSync.git`` <br>
 ``cd stylesync`` <br>
