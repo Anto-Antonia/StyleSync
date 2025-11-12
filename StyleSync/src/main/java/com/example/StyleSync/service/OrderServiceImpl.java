@@ -9,10 +9,10 @@ import com.example.StyleSync.exceptions.user.UserNotFoundException;
 import com.example.StyleSync.mapper.Order_OrderItemMapper;
 import com.example.StyleSync.repository.CartRepository;
 import com.example.StyleSync.repository.OrderRepository;
+import com.example.StyleSync.repository.ProductRepository;
 import com.example.StyleSync.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,13 +24,15 @@ public class OrderServiceImpl implements OrderService {
     private final CartServiceImpl cartService;
     private final Order_OrderItemMapper mapper;
     private final CartRepository cartRepository;
+    private final ProductRepository productRepository;
 
-    public OrderServiceImpl(UserRepository userRepository, OrderRepository orderRepository, CartServiceImpl cartService, Order_OrderItemMapper mapper, CartRepository cartRepository) {
+    public OrderServiceImpl(UserRepository userRepository, OrderRepository orderRepository, CartServiceImpl cartService, Order_OrderItemMapper mapper, CartRepository cartRepository, ProductRepository productRepository) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.cartService = cartService;
         this.mapper = mapper;
         this.cartRepository = cartRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -47,6 +49,17 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order order = mapper.fromOrderRequest(orderRequest, user, cartItems);
+
+        for(OrderItem item : order.getItemList()){
+            Product product = item.getProduct();
+            int newQuantity = product.getQuantity() - item.getQuantity();
+
+            if(newQuantity < 0){
+                throw new RuntimeException("Not enough stock for product: " + product.getProductName());
+            }
+            product.setQuantity(newQuantity);
+            productRepository.save(product);
+        }
 
         orderRepository.save(order);
 

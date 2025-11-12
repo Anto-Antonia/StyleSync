@@ -8,7 +8,7 @@ Designed for scalability, clarity and seamless integration with frontend clients
 
  - **JWT Authentication** - Secure login and registration role-based access (``ADMIN``, ``USER``);
  - **Cart System** - Add/remove items, auto-clear on order placement;
- - **Order Placement** - Pulls items from cart, stores shipping info, tracks status;
+ - **Order Placement** - Pulls items from cart, stores shipping info, tracks status, clears cart, updates the stock of the items;
  - **Order history** - Admin can view any user's orders;
  - **Favorite product** - Users can add any items to their favorite list;
  - **Role management** - Assign and manage roles;
@@ -24,6 +24,26 @@ Designed for scalability, clarity and seamless integration with frontend clients
 | Validation | Jakarta Bean Validation |
 | Build Tool | Maven                   |
 
+# Setup
+
+1. Clone repo
+2. Configure DB in ``application.properties``
+3. Run ``mvn spring-boot:run``
+4. Test endpoints with Postman
+
+### Default Admin
+Email: admin@stylesync.dev  
+Password: Admin@123
+
+This account is created automatically on first run.  
+Please change the password after login.
+
+## Database configuration
+Update `application.properties`:
+ - spring.datasource.url=jdbc:mysql://localhost:3306/stylesync
+ - spring.datasource.username=root
+ - spring.datasource.password=root
+ - spring.jpa.hibernate.ddl-auto=create (Use ``create`` for first run to generate tables, then switch to ``update`` for development changes. **For production**, set to ``none``.)
 
 # Installation
 
@@ -58,3 +78,4 @@ Designed for scalability, clarity and seamless integration with frontend clients
  - The status of the order is being manually changed
  - Empty cart returns ``200 OK`` with message instead of error
  - Enum values stored as strings (``CREDIT_CARD``, ``PENDING``, etc.)
+ - Update DB username/password in application.properties to match your local setup
