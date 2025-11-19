@@ -1,6 +1,6 @@
 package com.example.StyleSync.dto.response.product;
 
-import com.example.StyleSync.entity.StockStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,4 +14,9 @@ public class ProductResponse {
     private Double price;
     private Integer quantity;
     private String stockStatus;
+
+    public ProductResponse(String productName, Double price) {
+        this.productName = productName;
+        this.price = price;
+    }
 }

@@ -24,6 +24,11 @@ public class Product {
 
     @ManyToMany(mappedBy = "favoriteProducts")
     private List<User> favoriteByUser = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @Transient // makes sure this property is NOT PERSISTED TO THE DB
     public StockStatus getStockStatus(){
         if(quantity == 0){
