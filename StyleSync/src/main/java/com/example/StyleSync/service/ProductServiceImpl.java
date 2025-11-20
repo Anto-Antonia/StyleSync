@@ -3,9 +3,11 @@ package com.example.StyleSync.service;
 import com.example.StyleSync.dto.request.product.ProductRequest;
 import com.example.StyleSync.dto.request.product.UpdateProductRequest;
 import com.example.StyleSync.dto.response.product.ProductResponse;
+import com.example.StyleSync.entity.Category;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.mapper.ProductMapper;
+import com.example.StyleSync.repository.CategoryRepository;
 import com.example.StyleSync.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +19,12 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService{
     private final ProductMapper mapper;
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ProductServiceImpl(ProductMapper mapper, ProductRepository productRepository) {
+    public ProductServiceImpl(ProductMapper mapper, ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.mapper = mapper;
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -46,7 +50,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public void updateProduct(Integer id, UpdateProductRequest updateProductRequest) {
+    public ProductResponse updateProduct(Integer id, UpdateProductRequest updateProductRequest) {
         Optional<Product> optionalProduct = productRepository.findById(id);
 
         if(optionalProduct.isPresent()){
@@ -55,12 +59,18 @@ public class ProductServiceImpl implements ProductService{
             product1.setPrice(updateProductRequest.getPrice());
             product1.setQuantity(updateProductRequest.getQuantity());
 
+            if(updateProductRequest.getCategoryName() != null){
+                Category category = categoryRepository.findByCategoryName(updateProductRequest.getCategoryName())
+                        .orElseThrow(()-> new IllegalArgumentException("Category with name " + updateProductRequest.getCategoryName() + " not found."));
+            product1.setCategory(category);
+            }
+
             productRepository.save(product1);
+            return mapper.toProductResponse(product1);
         }
         else{
             throw new ProductNotFoundException("Product with ID " + id + " not found.");
         }
-
     }
 
     @Override

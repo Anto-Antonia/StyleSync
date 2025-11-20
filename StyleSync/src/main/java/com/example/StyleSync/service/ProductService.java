@@ -11,6 +11,6 @@ public interface ProductService {
     Product addProduct(ProductRequest productRequest);
     ProductResponse getProductById(Integer id);
     List<ProductResponse> getAllProducts();
-    void updateProduct(Integer id, UpdateProductRequest updateProductRequest);
+    ProductResponse updateProduct(Integer id, UpdateProductRequest updateProductRequest);
     void removeProduct(Integer id);
 }

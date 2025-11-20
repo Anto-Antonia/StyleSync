@@ -14,6 +14,7 @@ public class ProductResponse {
     private Double price;
     private Integer quantity;
     private String stockStatus;
+    private String categoryName;
 
     public ProductResponse(String productName, Double price) {
         this.productName = productName;

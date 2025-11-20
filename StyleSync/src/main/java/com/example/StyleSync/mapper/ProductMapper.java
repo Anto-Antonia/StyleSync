@@ -25,6 +25,7 @@ public class ProductMapper {
         productResponse.setPrice(product.getPrice());
         productResponse.setQuantity(product.getQuantity());
         productResponse.setStockStatus(product.getStockStatus().getLabel()); // calling the label from enum
+        productResponse.setCategoryName(product.getCategory().getCategoryName());
 
         return productResponse;
     }

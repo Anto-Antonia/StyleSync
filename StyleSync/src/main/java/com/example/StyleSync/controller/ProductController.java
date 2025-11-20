@@ -44,9 +44,9 @@ public class ProductController {
 
     @PatchMapping("/products/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> updateProduct(@PathVariable Integer id, @RequestBody UpdateProductRequest updateProductRequest){
-        service.updateProduct(id, updateProductRequest);
-        return ResponseEntity.ok("The product has been updated.");
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Integer id, @RequestBody UpdateProductRequest updateProductRequest){
+        ProductResponse response = service.updateProduct(id, updateProductRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{id}")
