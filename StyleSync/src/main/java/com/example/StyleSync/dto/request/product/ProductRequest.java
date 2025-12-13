@@ -1,5 +1,6 @@
 package com.example.StyleSync.dto.request.product;
 
+import com.example.StyleSync.entity.Category;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,4 +20,6 @@ public class ProductRequest {
     @NotNull
     @Min(0)
     private int quantity;
+
+    private String categoryName;
 }

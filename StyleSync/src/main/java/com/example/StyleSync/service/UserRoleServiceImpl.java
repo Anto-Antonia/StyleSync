@@ -1,6 +1,7 @@
 package com.example.StyleSync.service;
 
 import com.example.StyleSync.dto.request.role.RoleRequest;
+import com.example.StyleSync.dto.request.user.ChangePasswordRequest;
 import com.example.StyleSync.dto.request.user.UserRequest;
 import com.example.StyleSync.dto.request.user.UserUpdateUsername;
 import com.example.StyleSync.dto.response.product.FavoriteProductResponse;
@@ -19,6 +20,7 @@ import com.example.StyleSync.repository.ProductRepository;
 import com.example.StyleSync.repository.RoleRepository;
 import com.example.StyleSync.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +36,14 @@ public class UserRoleServiceImpl implements UserRoleService{
     private final RoleRepository roleRepository;
     private final ProductRepository productRepository;
     private final UserRoleMapper mapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserRoleServiceImpl(UserRepository userRepository, RoleRepository roleRepository, ProductRepository productRepository, UserRoleMapper mapper) {
+    public UserRoleServiceImpl(UserRepository userRepository, RoleRepository roleRepository, ProductRepository productRepository, UserRoleMapper mapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.productRepository = productRepository;
         this.mapper = mapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -204,5 +208,18 @@ public class UserRoleServiceImpl implements UserRoleService{
     @Override
     public void deleteRole(Integer id) {
     roleRepository.deleteById(id);
+    }
+
+    @Override
+    public void ChangePassword(ChangePasswordRequest changePasswordRequest, String username) {
+        User user = userRepository.findUserByEmail(username)
+                .orElseThrow(()-> new UserNotFoundException("User not found."));
+
+        if(!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())){
+            throw new IllegalArgumentException("Old password is incorrect.");
+        }
+
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        userRepository.save(user);
     }
 }

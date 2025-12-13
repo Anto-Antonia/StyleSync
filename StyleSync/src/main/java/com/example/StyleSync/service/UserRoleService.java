@@ -1,6 +1,7 @@
 package com.example.StyleSync.service;
 
 import com.example.StyleSync.dto.request.role.RoleRequest;
+import com.example.StyleSync.dto.request.user.ChangePasswordRequest;
 import com.example.StyleSync.dto.request.user.UserRequest;
 import com.example.StyleSync.dto.request.user.UserUpdateUsername;
 import com.example.StyleSync.dto.response.product.FavoriteProductResponse;
@@ -26,4 +27,5 @@ public interface UserRoleService {
     RoleResponse getRole(Integer id);
     List<RoleResponse> getAllRoles();
     void deleteRole(Integer id);
+    void ChangePassword(ChangePasswordRequest changePasswordRequest, String username);
 }

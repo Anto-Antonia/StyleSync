@@ -1,5 +1,6 @@
 package com.example.StyleSync.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +28,7 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
+    @JsonIgnoreProperties("productList") // should ignore the productList when sterilizing the category
     private Category category;
 
     @Transient // makes sure this property is NOT PERSISTED TO THE DB

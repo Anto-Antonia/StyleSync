@@ -1,6 +1,7 @@
 package com.example.StyleSync.controller;
 
 import com.example.StyleSync.dto.request.role.RoleRequest;
+import com.example.StyleSync.dto.request.user.ChangePasswordRequest;
 import com.example.StyleSync.dto.request.user.UserRequest;
 import com.example.StyleSync.dto.request.user.UserUpdateUsername;
 import com.example.StyleSync.dto.response.product.FavoriteProductResponse;
@@ -141,5 +142,14 @@ public class UserRoleController {
     public ResponseEntity<String> deleteRole(@PathVariable @Valid Integer id){
         service.deleteRole(id);
         return ResponseEntity.ok("The role with id " + id + " has been deleted");
+    }
+
+    @PostMapping("/change-password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest, Authentication authentication){
+        String username = authentication.getName();
+        service.ChangePassword(changePasswordRequest, username);
+
+        return ResponseEntity.ok("Password changed successfully!");
     }
 }
