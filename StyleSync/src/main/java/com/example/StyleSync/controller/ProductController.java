@@ -6,6 +6,7 @@ import com.example.StyleSync.dto.response.product.ProductResponse;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.service.ProductService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,5 +55,12 @@ public class ProductController {
     public ResponseEntity<String> removeProduct(@PathVariable @Valid Integer id){
         service.removeProduct(id);
         return ResponseEntity.ok("The product with id " + id + " has been removed");
+    }
+
+    @PutMapping("/{productId}/category/{categoryName}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductResponse> addCategoryToProduct(@PathVariable Integer productId, @PathVariable String categoryName){
+        ProductResponse response = service.addCategoryToProduct(productId, categoryName);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

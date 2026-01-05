@@ -5,6 +5,7 @@ import com.example.StyleSync.dto.request.product.UpdateProductRequest;
 import com.example.StyleSync.dto.response.product.ProductResponse;
 import com.example.StyleSync.entity.Category;
 import com.example.StyleSync.entity.Product;
+import com.example.StyleSync.exceptions.category.CategoryNotFound;
 import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.mapper.ProductMapper;
 import com.example.StyleSync.repository.CategoryRepository;
@@ -76,5 +77,17 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public void removeProduct(Integer id) {
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public ProductResponse addCategoryToProduct(Integer productId, String categoryName) {
+        Product product = productRepository.findById(productId).orElseThrow(()-> new ProductNotFoundException("The product with id: " + productId + " was not found."));
+        Category category = categoryRepository.findByCategoryName(categoryName).orElseThrow(()-> new CategoryNotFound("Category not with name: '" + categoryName + "' was not found."));
+
+        product.setCategory(category);
+
+        Product updated = productRepository.save(product);
+
+        return mapper.toProductResponse(updated);
     }
 }
