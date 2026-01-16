@@ -2,12 +2,14 @@ package com.example.StyleSync.service;
 
 import com.example.StyleSync.dto.request.user.UserRequest;
 import com.example.StyleSync.dto.request.user.UserUpdateUsername;
+import com.example.StyleSync.dto.response.product.FavoriteProductResponse;
 import com.example.StyleSync.dto.response.product.ProductResponse;
 import com.example.StyleSync.dto.response.role.RoleResponse;
 import com.example.StyleSync.dto.response.user.UserResponse;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.entity.Role;
 import com.example.StyleSync.entity.User;
+import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.exceptions.role.RoleNotFoundException;
 import com.example.StyleSync.exceptions.user.EmailAlreadyExistsException;
 import com.example.StyleSync.exceptions.user.UserNotFoundException;
@@ -65,6 +67,8 @@ public class UserRoleServiceTest {
         product = new Product();
         product.setId(1);
         product.setProductName("Skirt");
+        product.setPrice(10.99);
+        product.setQuantity(1);
 
         user = new User();
         user.setId(1);
@@ -73,7 +77,7 @@ public class UserRoleServiceTest {
         user.setEmail("email@email.com");
         user.setPassword("password");
         user.setRole(role);
-        user.setFavoriteProducts(new ArrayList<>(Arrays.asList(product)));
+        user.setFavoriteProducts(new ArrayList<>());
     }
 
     //any(User.class) instead of exact instance
@@ -222,4 +226,118 @@ public class UserRoleServiceTest {
 
         verify(userRepository, never()).save(any());
     }
+
+    @Test
+    void addItemToFavorite_whenNotAlreadyFavorite_addItemToFavorite(){
+        Integer itemId = 1;
+        String email = "email@email.com";
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+        when(productRepository.findById(itemId)).thenReturn(Optional.of(product));
+
+        service.addItemToFavorite(email, itemId);
+        assertTrue(user.getFavoriteProducts().contains(product));
+
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void addItemToFavorite_whenAlreadyFavorite_addItemToFavorite(){
+        Integer itemId = 1;
+        String email = "email@email.com";
+
+        user.getFavoriteProducts().add(product);
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+        when(productRepository.findById(itemId)).thenReturn(Optional.of(product));
+
+        service.addItemToFavorite(email, itemId);
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void addItemToFavorite_whenItemNotFound_throwException(){
+        Integer itemId = 1;
+        String email = "email@email.com";
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+        when(productRepository.findById(itemId)).thenReturn(Optional.empty());
+
+        assertThrows(ProductNotFoundException.class, ()-> service.addItemToFavorite(email, itemId));
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void addItemToFavorite_whenUserDoesNotExist_throwException(){
+        Integer itemId = 1;
+        String email = "email@email.com";
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, ()-> service.addItemToFavorite(email, itemId));
+
+        verify(productRepository, never()).findById(itemId);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void removeItemFromFav_whenSuccessful_removeItemFromFav(){
+        Integer itemId = 1;
+        String email = "email@email.com";
+
+        user.getFavoriteProducts().add(product);
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+        when(productRepository.findById(itemId)).thenReturn(Optional.of(product));
+
+        service.removeItemFromFavorite(email, itemId);
+
+        assertFalse(user.getFavoriteProducts().contains(product));
+
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void removeItemFromFav_whenItemIsNotInFav_doNothing(){
+        Integer itemId = 1;
+        String email = "email@email.com";
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+        when(productRepository.findById(itemId)).thenReturn(Optional.of(product));
+
+        service.removeItemFromFavorite(email, itemId);
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void getFavoriteProducts_whenSuccessful_returnProduct(){
+        String email = "email@email.com";
+
+        user.getFavoriteProducts().add(product); // making sure the user has a fav product
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+
+        List<FavoriteProductResponse> favorites = service.getFavoriteProducts(email);
+
+        assertEquals(1, favorites.size());
+        assertEquals(product.getProductName(), favorites.get(0).getProductName());
+        assertEquals(product.getPrice(), favorites.get(0).getPrice());
+        assertEquals(product.getQuantity(), favorites.get(0).getQuantity());
+
+        verify(userRepository, times(1)).findUserByEmail(email);
+    }
+
+    @Test
+    void deleteUser_whenSuccessful_deleteUser(){
+        Integer userId = 1;
+
+        service.deleteUser(userId);
+
+        verify(userRepository, times(1)).deleteById(userId);
+    }
+
+
 }
