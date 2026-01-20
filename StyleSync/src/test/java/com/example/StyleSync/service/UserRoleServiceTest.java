@@ -1,15 +1,16 @@
 package com.example.StyleSync.service;
 
+import com.example.StyleSync.dto.request.role.RoleRequest;
 import com.example.StyleSync.dto.request.user.UserRequest;
 import com.example.StyleSync.dto.request.user.UserUpdateUsername;
 import com.example.StyleSync.dto.response.product.FavoriteProductResponse;
-import com.example.StyleSync.dto.response.product.ProductResponse;
 import com.example.StyleSync.dto.response.role.RoleResponse;
 import com.example.StyleSync.dto.response.user.UserResponse;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.entity.Role;
 import com.example.StyleSync.entity.User;
 import com.example.StyleSync.exceptions.product.ProductNotFoundException;
+import com.example.StyleSync.exceptions.role.RoleAlreadyExistsException;
 import com.example.StyleSync.exceptions.role.RoleNotFoundException;
 import com.example.StyleSync.exceptions.user.EmailAlreadyExistsException;
 import com.example.StyleSync.exceptions.user.UserNotFoundException;
@@ -27,7 +28,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,6 +78,8 @@ public class UserRoleServiceTest {
         user.setPassword("password");
         user.setRole(role);
         user.setFavoriteProducts(new ArrayList<>());
+
+        roleResponse = new RoleResponse("ROLE_USER");
     }
 
     //any(User.class) instead of exact instance
@@ -339,5 +341,117 @@ public class UserRoleServiceTest {
         verify(userRepository, times(1)).deleteById(userId);
     }
 
+    @Test
+    void addRole_whenRoleDoesNotExist_returnRole(){
+        RoleRequest request = new RoleRequest("ROLE_ADMIN");
 
+        Role role = new Role("ROLE_ADMIN");
+
+        when(roleRepository.findRoleByName("ROLE_ADMIN")).thenReturn(Optional.empty());
+        when(mapper.fromRoleRequest(request)).thenReturn(role);
+        when(roleRepository.save(role)).thenReturn(role);
+
+        Role result = service.addRole(request);
+
+        assertNotNull(result);
+        assertEquals("ROLE_ADMIN", result.getName());
+
+        verify(roleRepository, times(1)).save(role);
+    }
+
+    @Test
+    void addRole_whenRoleExists_throwException(){
+        RoleRequest request = new RoleRequest("ROLE_USER");
+
+        Role role = new Role("ROLE_USER");
+
+        when(roleRepository.findRoleByName("ROLE_USER")).thenReturn(Optional.of(role));
+        assertThrows(RoleAlreadyExistsException.class, ()-> service.addRole(request));
+
+        verify(roleRepository, never()).save(role);
+        verify(mapper, never()).fromRoleRequest(any());
+    }
+
+    @Test
+    void addRoleToUser_whenSuccessful_addRoleToUser(){
+        String roleName = "ROLE_USER";
+        Integer userId = 1;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(roleRepository.findRoleByName(roleName)).thenReturn(Optional.of(role));
+
+        service.addRoleToUser(userId, roleName);
+
+        assertEquals(role, user.getRole());
+
+        verify(userRepository, times(1)).findById(userId);
+        verify(roleRepository, times(1)).findRoleByName(roleName);
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void addRoleToUser_whenUserNotFound_throwException(){
+        String roleName = "ROLE_USER";
+        Integer userId = 1;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, ()-> service.addRoleToUser(userId, roleName));
+
+        verify(roleRepository, never()).findRoleByName(roleName);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void addRoleToUser_whenRoleNotFound_throwException(){
+        String roleName = "ROLE_USER";
+        Integer userId = 1;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(roleRepository.findRoleByName(roleName)).thenReturn(Optional.empty());
+
+        assertThrows(RoleNotFoundException.class, ()-> service.addRoleToUser(userId, roleName));
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void getRole_whenSuccessful_returnRole(){
+        Integer roleId = 1;
+
+        when(roleRepository.findById(roleId)).thenReturn(Optional.of(role));
+        when(mapper.fromRoleResponse(role)).thenReturn(roleResponse);
+
+        RoleResponse response = service.getRole(roleId);
+
+        assertNotNull(response);
+        assertEquals(roleResponse.getRoleName(), response.getRoleName());
+
+        verify(roleRepository, times(1)).findById(roleId);
+        verify(mapper, times(1)).fromRoleResponse(role);
+    }
+
+    @Test
+    void getRole_whenRoleDoesNotExist_throwException(){
+        Integer roleId = 1;
+
+        when(roleRepository.findById(roleId)).thenReturn(Optional.empty());
+
+        assertThrows(RoleNotFoundException.class, ()-> service.getRole(roleId));
+
+        verify(mapper, never()).fromRoleResponse(any());
+    }
+
+    @Test
+    void getAllRoles_whenSuccessful_returnRoles(){
+        when(roleRepository.findAll()).thenReturn(List.of(role));
+        when(mapper.fromRoleResponse(role)).thenReturn(roleResponse);
+
+        List<RoleResponse> roles = service.getAllRoles();
+
+        assertEquals("ROLE_USER", roles.get(0).getRoleName());
+
+        verify(roleRepository, times(1)).findAll();
+        verify(mapper, times(1)).fromRoleResponse(role);
+    }
 }
