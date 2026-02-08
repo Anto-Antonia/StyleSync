@@ -27,5 +27,5 @@ public interface UserRoleService {
     RoleResponse getRole(Integer id);
     List<RoleResponse> getAllRoles();
     void deleteRole(Integer id);
-    void ChangePassword(ChangePasswordRequest changePasswordRequest, String username);
+    void changePassword(ChangePasswordRequest changePasswordRequest, String username);
 }

@@ -148,7 +148,7 @@ public class UserRoleController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest, Authentication authentication){
         String username = authentication.getName();
-        service.ChangePassword(changePasswordRequest, username);
+        service.changePassword(changePasswordRequest, username);
 
         return ResponseEntity.ok("Password changed successfully!");
     }

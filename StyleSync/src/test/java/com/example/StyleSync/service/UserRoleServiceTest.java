@@ -1,6 +1,7 @@
 package com.example.StyleSync.service;
 
 import com.example.StyleSync.dto.request.role.RoleRequest;
+import com.example.StyleSync.dto.request.user.ChangePasswordRequest;
 import com.example.StyleSync.dto.request.user.UserRequest;
 import com.example.StyleSync.dto.request.user.UserUpdateUsername;
 import com.example.StyleSync.dto.response.product.FavoriteProductResponse;
@@ -9,6 +10,7 @@ import com.example.StyleSync.dto.response.user.UserResponse;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.entity.Role;
 import com.example.StyleSync.entity.User;
+import com.example.StyleSync.exceptions.auth.InvalidPasswordException;
 import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.exceptions.role.RoleAlreadyExistsException;
 import com.example.StyleSync.exceptions.role.RoleNotFoundException;
@@ -453,5 +455,62 @@ public class UserRoleServiceTest {
 
         verify(roleRepository, times(1)).findAll();
         verify(mapper, times(1)).fromRoleResponse(role);
+    }
+
+    @Test
+    void deleteRole_whenSuccessful_deleteRole(){
+        Integer roleId = 1;
+
+        service.deleteRole(roleId);
+
+        verify(roleRepository, times(1)).deleteById(roleId);
+    }
+
+    @Test
+    void changePassword_whenSuccessful_updatePassword(){
+        String email = "email@email.com";
+
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPassword", "newPassword");
+
+        user.setPassword("encodedOldPassword");
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("oldPassword", "encodedOldPassword")).thenReturn(true);
+        when(passwordEncoder.encode("newPassword")).thenReturn("encodedNewPassword");
+
+        service.changePassword(request, email);
+
+        assertEquals("encodedNewPassword", user.getPassword());
+
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void changePassword_whenUserNotFound_throwException(){
+        String email = "email@email.com";
+
+        ChangePasswordRequest request = new ChangePasswordRequest("oldPassword", "newPassword");
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, ()-> service.changePassword(request, email));
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void changePassword_whenOldPasswordIsIncorrect_throwException(){
+        String email = "email@email.com";
+
+        ChangePasswordRequest request = new ChangePasswordRequest("wrongPassword", "newPassword");
+
+        user.setPassword("encodedOldPassword");
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrongPassword", "encodedOldPassword")).thenReturn(false);
+
+        assertThrows(InvalidPasswordException.class, ()-> service.changePassword(request, email));
+
+        verify(userRepository, never()).save(any());
     }
 }

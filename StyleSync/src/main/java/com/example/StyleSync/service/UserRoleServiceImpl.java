@@ -10,6 +10,7 @@ import com.example.StyleSync.dto.response.user.UserResponse;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.entity.Role;
 import com.example.StyleSync.entity.User;
+import com.example.StyleSync.exceptions.auth.InvalidPasswordException;
 import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.exceptions.role.RoleAlreadyExistsException;
 import com.example.StyleSync.exceptions.role.RoleNotFoundException;
@@ -211,12 +212,12 @@ public class UserRoleServiceImpl implements UserRoleService{
     }
 
     @Override
-    public void ChangePassword(ChangePasswordRequest changePasswordRequest, String username) {
+    public void changePassword(ChangePasswordRequest changePasswordRequest, String username) {
         User user = userRepository.findUserByEmail(username)
                 .orElseThrow(()-> new UserNotFoundException("User not found."));
 
         if(!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())){
-            throw new IllegalArgumentException("Old password is incorrect.");
+            throw new InvalidPasswordException("Old password is incorrect.");
         }
 
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
