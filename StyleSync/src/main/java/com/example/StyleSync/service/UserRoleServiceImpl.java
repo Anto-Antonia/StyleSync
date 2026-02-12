@@ -223,4 +223,5 @@ public class UserRoleServiceImpl implements UserRoleService{
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         userRepository.save(user);
     }
+
 }
