@@ -4,6 +4,7 @@ import com.example.StyleSync.dto.request.product.ProductRequest;
 import com.example.StyleSync.dto.response.product.ProductResponse;
 import com.example.StyleSync.entity.Category;
 import com.example.StyleSync.entity.Product;
+import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.mapper.ProductMapper;
 import com.example.StyleSync.repository.CategoryRepository;
 import com.example.StyleSync.repository.ProductRepository;
@@ -15,9 +16,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,5 +67,30 @@ public class ProductServiceTest {
         assertNotNull(result);
         assertEquals("Hat", result.getProductName());
          verify(productRepository, times(1)).save(product);
+    }
+
+    @Test
+    void getProductById_whenProductExists_returnProduct(){
+        when(productRepository.findById(1)).thenReturn(Optional.of(product));
+        when(mapper.toProductResponse(product)).thenReturn(new ProductResponse(product.getId(), product.getProductName(), product.getPrice(), product.getQuantity(), product.getStockStatus().getLabel(), product.getCategory().getCategoryName()));
+
+        ProductResponse response = service.getProductById(1);
+
+        assertNotNull(response);
+        assertEquals(1, response.getId());
+        assertEquals("Hat", response.getProductName());
+        assertEquals(9.99, response.getPrice());
+        assertEquals(100, response.getQuantity());
+        assertEquals("Head wears", response.getCategoryName());
+
+
+    }
+    @Test
+    void getProductById_whenProductNotFound_throwException(){
+        when(productRepository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(ProductNotFoundException.class, ()-> service.getProductById(1));
+
+        verify(mapper, never()).toProductResponse(any());
     }
 }
