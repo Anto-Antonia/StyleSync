@@ -1,6 +1,7 @@
 package com.example.StyleSync.service;
 
 import com.example.StyleSync.dto.request.product.ProductRequest;
+import com.example.StyleSync.dto.request.product.UpdateProductRequest;
 import com.example.StyleSync.dto.response.product.ProductResponse;
 import com.example.StyleSync.entity.Category;
 import com.example.StyleSync.entity.Product;
@@ -92,5 +93,40 @@ public class ProductServiceTest {
         assertThrows(ProductNotFoundException.class, ()-> service.getProductById(1));
 
         verify(mapper, never()).toProductResponse(any());
+    }
+
+    @Test
+    void getAllProducts_whenSuccessful_returnProducts(){
+        when(productRepository.findAll()).thenReturn(List.of(product));
+        when(mapper.toProductResponse(product)).thenReturn(response);
+
+        List<ProductResponse> responses = service.getAllProducts();
+
+        assertEquals(1, responses.size());
+
+        verify(mapper, times(1)).toProductResponse(product);
+    }
+
+    @Test
+    void updateProduct_whenSuccessful_returnProduct(){
+        Integer productId = 1;
+
+        UpdateProductRequest updateProductRequest = new UpdateProductRequest("Jeans", 50, 10.99, "pants");
+
+        Category category = new Category();
+        category.setId(2);
+        category.setCategoryName("pants");
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(categoryRepository.findByCategoryName("pants")).thenReturn(Optional.of(category));
+
+        service.updateProduct(productId, updateProductRequest);
+
+        assertEquals("Jeans", product.getProductName());
+        assertEquals(50, product.getQuantity());
+        assertEquals(10.99, product.getPrice());
+        assertEquals("pants", product.getCategory().getCategoryName());
+
+        verify(productRepository, times(1)).save(product);
     }
 }
