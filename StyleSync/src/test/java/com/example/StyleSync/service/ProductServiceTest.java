@@ -129,4 +129,31 @@ public class ProductServiceTest {
 
         verify(productRepository, times(1)).save(product);
     }
+
+    @Test
+    void updateProduct_whenProductNotFound_throwException(){
+        Integer productId = 1;
+
+        UpdateProductRequest request = new UpdateProductRequest("Hat", 50, 5.99, "head wears");
+
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+        assertThrows(ProductNotFoundException.class, ()->service.updateProduct(productId, request));
+
+        verify(mapper, never()).toProductResponse(any());
+    }
+
+    @Test
+    void updateProduct_whenCategoryNotFound_throwException(){
+        Integer productId = 1;
+
+        UpdateProductRequest request = new UpdateProductRequest("Hat", 50, 5.89, "head wears");
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(categoryRepository.findByCategoryName("head wears")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, ()-> service.updateProduct(productId, request));
+
+        verify(productRepository, never()).save(any());
+    }
 }
