@@ -140,7 +140,7 @@ public class ProductServiceTest {
 
         assertThrows(ProductNotFoundException.class, ()->service.updateProduct(productId, request));
 
-        verify(mapper, never()).toProductResponse(any());
+        verify(productRepository, never()).save(any());
     }
 
     @Test
