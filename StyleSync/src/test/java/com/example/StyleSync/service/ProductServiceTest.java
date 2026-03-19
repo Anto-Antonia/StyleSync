@@ -5,6 +5,7 @@ import com.example.StyleSync.dto.request.product.UpdateProductRequest;
 import com.example.StyleSync.dto.response.product.ProductResponse;
 import com.example.StyleSync.entity.Category;
 import com.example.StyleSync.entity.Product;
+import com.example.StyleSync.exceptions.category.CategoryNotFound;
 import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.mapper.ProductMapper;
 import com.example.StyleSync.repository.CategoryRepository;
@@ -156,4 +157,54 @@ public class ProductServiceTest {
 
         verify(productRepository, never()).save(any());
     }
+
+    @Test
+    void removeProduct_whenSuccessful_removeProduct(){
+        Integer productId = 1;
+
+         service.removeProduct(productId);
+
+        verify(productRepository, times(1)).deleteById(productId);
+    }
+
+    @Test
+    void addCategoryToProduct_whenSuccessful_updateProduct(){
+        Integer productId = 1;
+        String categoryN = "head wears";
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(categoryRepository.findByCategoryName(categoryN)).thenReturn(Optional.of(category));
+
+        service.addCategoryToProduct(productId, categoryN);
+
+        verify(productRepository, times(1)).findById(productId);
+        verify(categoryRepository, times(1)).findByCategoryName(categoryN);
+        verify(productRepository, times(1)).save(product);
+    }
+
+    @Test
+    void addCategoryToProduct_whenProductNotFound_throwException(){
+        Integer productId = 1;
+        String categoryN = "head wears";
+
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+
+        assertThrows(ProductNotFoundException.class, ()-> service.addCategoryToProduct(productId, categoryN));
+
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void addCategoryToProduct_whenCategoryNotFound_throwException(){
+        Integer productId = 1;
+        String categoryN = "head wears";
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(categoryRepository.findByCategoryName(categoryN)).thenReturn(Optional.empty());
+
+        assertThrows(CategoryNotFound.class, ()-> service.addCategoryToProduct(productId,categoryN));
+
+        verify(productRepository, never()).save(any());
+    }
+
 }

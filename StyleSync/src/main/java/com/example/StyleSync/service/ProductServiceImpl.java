@@ -81,8 +81,10 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ProductResponse addCategoryToProduct(Integer productId, String categoryName) {
-        Product product = productRepository.findById(productId).orElseThrow(()-> new ProductNotFoundException("The product with id: " + productId + " was not found."));
-        Category category = categoryRepository.findByCategoryName(categoryName).orElseThrow(()-> new CategoryNotFound("Category not with name: '" + categoryName + "' was not found."));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(()-> new ProductNotFoundException("The product with id: " + productId + " was not found."));
+        Category category = categoryRepository
+                .findByCategoryName(categoryName).orElseThrow(()-> new CategoryNotFound("Category with name: '" + categoryName + "' was not found."));
 
         product.setCategory(category);
 
