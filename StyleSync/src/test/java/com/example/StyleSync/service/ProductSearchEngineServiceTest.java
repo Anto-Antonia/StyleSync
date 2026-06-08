@@ -3,6 +3,7 @@ package com.example.StyleSync.service;
 import com.example.StyleSync.dto.response.product.ProductResponse;
 import com.example.StyleSync.entity.Category;
 import com.example.StyleSync.entity.Product;
+import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.mapper.ProductMapper;
 import com.example.StyleSync.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,9 +13,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 
@@ -74,6 +78,33 @@ public class ProductSearchEngineServiceTest {
 
     @Test
     void searchByKeyword_whenProductNotFound_throwsProductNotFoundError(){
+        when(productRepository.findByProductNameContainingIgnoreCase("Shirt")).thenReturn(Collections.emptyList());
 
+        assertThrows(ProductNotFoundException.class, ()-> service.searchProductByKeyword("Shirt"));
+
+        verify(mapper, never()).toProductResponse(any());
+    }
+    @Test
+    void searchProductByName_whenProductFound_returnProductList(){
+        when(productRepository.findByProductNameIgnoreCase("Beige Shirt")).thenReturn(List.of(product));
+        when(mapper.toProductResponse(product)).thenReturn(productResponse);
+
+        List<ProductResponse> responses = service.searchProductByName("Beige Shirt");
+
+        assertEquals(1, responses.size());
+        assertEquals("Beige Shirt", responses.get(0).getProductName());
+        assertEquals("Tops", responses.get(0).getCategoryName());
+
+        verify(productRepository, times(1)).findByProductNameIgnoreCase("Beige Shirt");
+        verify(mapper, times(1)).toProductResponse(product);
+    }
+
+    @Test
+    void searchProductByName_whenProductNotFound_throwException(){
+        when(productRepository.findByProductNameIgnoreCase("Beige Shirt")).thenReturn(Collections.emptyList());
+
+        assertThrows(ProductNotFoundException.class, ()-> service.searchProductByName("Beige Shirt"));
+
+        verify(mapper, never()).toProductResponse(any());
     }
 }
