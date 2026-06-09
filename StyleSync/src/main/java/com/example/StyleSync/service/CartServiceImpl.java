@@ -6,6 +6,7 @@ import com.example.StyleSync.entity.CartItem;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.entity.User;
 import com.example.StyleSync.exceptions.cart.CartIsAlreadyEmpty;
+import com.example.StyleSync.exceptions.cart.CartItemNotFoundException;
 import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.exceptions.user.UserNotFoundException;
 import com.example.StyleSync.mapper.Cart_CartItemMapper;
@@ -40,9 +41,9 @@ public class CartServiceImpl implements CartService{
     @Override
     public void addItemToCart(String email, Integer productId, int quantity) {
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(()-> new RuntimeException("User not found."));
+                .orElseThrow(()-> new UserNotFoundException("User not found."));
         Product product = productRepository.findById(productId)
-                .orElseThrow(()-> new RuntimeException("Product not found."));
+                .orElseThrow(()-> new ProductNotFoundException("Product not found."));
 
         Cart cart = user.getCart();
         if(cart == null){
@@ -73,15 +74,15 @@ public class CartServiceImpl implements CartService{
     @Override
     public void removeProductFromCart(String email, Integer productId) {
     User user = userRepository.findUserByEmail(email)
-            .orElseThrow(()-> new RuntimeException("User not found"));
+            .orElseThrow(()-> new UserNotFoundException("User not found"));
     Cart cart = user.getCart();
     if(cart == null || cart.getItems() == null){
-        throw new RuntimeException("The cart is empty.");
+        throw new CartIsAlreadyEmpty("The cart is empty.");
     }
 
     CartItem itemToRemove = cart.getItems().stream()
             .filter(ex ->ex.getProduct().getId().equals(productId)).findFirst()
-            .orElseThrow(()-> new RuntimeException("Item not found in cart."));
+            .orElseThrow(()-> new CartItemNotFoundException("Item not found in cart."));
 
     cart.getItems().remove(itemToRemove);
     cartItemRepository.delete(itemToRemove);
