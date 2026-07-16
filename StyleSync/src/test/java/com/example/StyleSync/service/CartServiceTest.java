@@ -95,12 +95,8 @@ public class CartServiceTest {
 
     @Test
     void addItemToCart_whenProductAlreadyExists_UpdateQuantity(){
-        CartItem existingItem = new CartItem();
-        existingItem.setProduct(product);
-        existingItem.setQuantity(2);
-        existingItem.setCart(cart);
 
-        cart.getItems().add(existingItem);
+        cart.getItems().add(cartItem);
 
         when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(user));
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
@@ -108,7 +104,7 @@ public class CartServiceTest {
         service.addItemToCart(EMAIL, PRODUCT_ID, 1);
 
         assertEquals(1, cart.getItems().size());
-        assertEquals(3, cart.getItems().get(0).getQuantity());
+        assertEquals(2, cart.getItems().get(0).getQuantity());
 
         verify(cartRepository).save(cart);
     }
@@ -135,12 +131,8 @@ public class CartServiceTest {
 
     @Test
     void removeProductFromCart_whenSuccessful_removeItemFromCart(){
-        CartItem existingItem = new CartItem();
-        existingItem.setProduct(product);
-        existingItem.setQuantity(1);
-        existingItem.setCart(cart);
 
-        cart.getItems().add(existingItem);
+        cart.getItems().add(cartItem);
 
         when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(user));
 
@@ -149,7 +141,7 @@ public class CartServiceTest {
         assertTrue(cart.getItems().isEmpty());
 
         verify(userRepository, times(1)).findUserByEmail(EMAIL);
-        verify(cartItemRepository, times(1)).delete(existingItem);
+        verify(cartItemRepository, times(1)).delete(cartItem);
         verify(cartRepository, times(1)).save(cart);
     }
 
@@ -162,5 +154,10 @@ public class CartServiceTest {
         verify(cartItemRepository, never()).delete(any());
         verify(cartRepository, never()).save(any());
 
+    }
+
+    @Test
+    void updateProductQuantity_whenSuccessful_updateQuantity(){
+        cart.getItems().add(cartItem);
     }
 }
