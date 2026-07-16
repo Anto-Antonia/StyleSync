@@ -252,4 +252,36 @@ public class CartServiceTest {
 
         verify(mapper, never()).toCartResponse(any());
     }
+
+    @Test
+    void clearCart_whenSuccessful_clearCart(){
+        cart.getItems().add(cartItem);
+
+        when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(user));
+
+        service.clearCart(EMAIL);
+
+        assertTrue(cart.getItems().isEmpty());
+
+        verify(userRepository).findUserByEmail(EMAIL);
+        verify(cartRepository).save(cart);
+    }
+
+    @Test
+    void clearCart_whenUserNotFound_throwException(){
+        when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, ()-> service.clearCart(EMAIL));
+
+        verify(cartRepository, never()).save(any());
+    }
+
+    @Test
+    void clearCart_whenCartAlreadyEmpty_throwException(){
+        when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(user));
+
+        assertThrows(CartIsAlreadyEmpty.class, ()-> service.clearCart(EMAIL));
+
+        verify(cartRepository, never()).save(any());
+    }
 }
