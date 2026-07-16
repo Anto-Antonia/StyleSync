@@ -1,9 +1,12 @@
 package com.example.StyleSync.service;
 
+import com.example.StyleSync.dto.response.cart.CartItemResponse;
+import com.example.StyleSync.dto.response.cart.CartResponse;
 import com.example.StyleSync.entity.Cart;
 import com.example.StyleSync.entity.CartItem;
 import com.example.StyleSync.entity.Product;
 import com.example.StyleSync.entity.User;
+import com.example.StyleSync.exceptions.cart.CartIsAlreadyEmpty;
 import com.example.StyleSync.exceptions.cart.CartItemNotFoundException;
 import com.example.StyleSync.exceptions.product.ProductNotFoundException;
 import com.example.StyleSync.exceptions.user.UserNotFoundException;
@@ -159,5 +162,94 @@ public class CartServiceTest {
     @Test
     void updateProductQuantity_whenSuccessful_updateQuantity(){
         cart.getItems().add(cartItem);
+
+        when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(user));
+
+        service.updateProductQuantity(EMAIL, PRODUCT_ID, 3);
+
+        assertEquals(3, cartItem.getQuantity());
+        verify(cartRepository).save(cart);
+    }
+
+    @Test
+    void updateProductQuantity_whenUserNotFound_throwException(){
+       when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.empty());
+
+       assertThrows(UserNotFoundException.class, ()-> service.updateProductQuantity(EMAIL, PRODUCT_ID, 3));
+
+       verify(userRepository).findUserByEmail(EMAIL);
+       verify(cartRepository, never()).save(any());
+    }
+
+    @Test
+    void updateProductQuantity_whenProductNotFound_throwException(){
+        when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(user));
+
+        assertThrows(ProductNotFoundException.class, ()-> service.updateProductQuantity(EMAIL, PRODUCT_ID, 3));
+
+        verify(cartRepository, never()).save(any());
+    }
+
+    @Test
+    void updateProductQuantity_whenQuantityIsZero_removeProduct(){
+        cart.getItems().add(cartItem);
+
+        when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(user));
+
+        service.updateProductQuantity(EMAIL, PRODUCT_ID, 0);
+
+        assertTrue(cart.getItems().isEmpty());
+
+        verify(cartItemRepository).delete(cartItem);
+        verify(cartRepository).save(any());
+    }
+
+    @Test
+    void getUserCart_whenSuccessful_returnUserCart(){
+        cart.getItems().add(cartItem);
+
+        CartItemResponse itemResponse = new CartItemResponse();
+        itemResponse.setId(1);
+        itemResponse.setProductId(1);
+        itemResponse.setProductName("Hat");
+        itemResponse.setPrice(9.99);
+        itemResponse.setQuantity(1);
+        itemResponse.setTotalPrice(9.99);
+
+        CartResponse response = new CartResponse();
+        response.setId(1);
+        response.setItems(List.of(itemResponse));
+        response.setTotal(9.99);
+
+        when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(user));
+        when(mapper.toCartResponse(cart)).thenReturn(response);
+
+        CartResponse result = service.getUserCart(EMAIL);
+
+        assertNotNull(result);
+        assertEquals(1, result.getId());
+        assertEquals(1, result.getItems().size());
+        assertEquals(9.99, result.getTotal());
+
+        verify(userRepository).findUserByEmail(EMAIL);
+        verify(mapper).toCartResponse(cart);
+
+    }
+
+    @Test
+    void getUserCart_whenUserNotFound_throwError(){
+        when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, ()-> service.getUserCart(EMAIL));
+
+        verify(mapper, never()).toCartResponse(any());
+    }
+
+    @Test
+    void getUserCart_whenCartIsEmpty_throwEmptyCartError(){
+        when(userRepository.findUserByEmail(EMAIL)).thenReturn(Optional.of(user));
+        assertThrows(CartIsAlreadyEmpty.class, ()-> service.getUserCart(EMAIL));
+
+        verify(mapper, never()).toCartResponse(any());
     }
 }
