@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/search/")
+@RequestMapping("/api/search")
 public class ProductSearchEngine {
 
     private final ProductSearchEngineServiceImpl service;
@@ -18,13 +18,13 @@ public class ProductSearchEngine {
         this.service = service;
     }
 
-    @GetMapping("keyword")
+    @GetMapping("/keyword")
     public ResponseEntity<List<ProductResponse>> searchProductByKeyword (@RequestParam String keyword){
         List<ProductResponse> responses = service.searchProductByKeyword(keyword);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
-    @GetMapping("name")
+    @GetMapping("/name")
     public ResponseEntity<List<ProductResponse>> searchProductByName(@RequestParam String productName){
         List<ProductResponse> responses = service.searchProductByName(productName);
         return ResponseEntity.status(HttpStatus.OK).body(responses);

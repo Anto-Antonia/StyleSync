@@ -4,6 +4,7 @@ import com.example.StyleSync.jwt.JwtFilter;
 import com.example.StyleSync.service.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -36,6 +37,8 @@ public class SecurityConfig {
                         SessionCreationPolicy.STATELESS)) // no session
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register", "/api/auth/signIn").permitAll() // public endpoint
+                        .requestMatchers(HttpMethod.GET, "/api/product/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/search/keyword", "/api/search/name").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // plug in JWT filter
