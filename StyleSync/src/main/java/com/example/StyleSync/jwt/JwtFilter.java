@@ -1,5 +1,6 @@
 package com.example.StyleSync.jwt;
 
+import com.example.StyleSync.repository.RevokedTokenRepository;
 import com.example.StyleSync.repository.UserRepository;
 import com.example.StyleSync.service.security.UserDetailsImpl;
 import jakarta.servlet.FilterChain;
@@ -18,10 +19,12 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
         private final JwtUtils jwtUtil;
         private final UserRepository userRepository;
+        private final RevokedTokenRepository tokenRepository;
 
-    public JwtFilter(JwtUtils jwtUtil, UserRepository userRepository) {
+    public JwtFilter(JwtUtils jwtUtil, UserRepository userRepository, RevokedTokenRepository tokenRepository) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = header.substring(7);
 
-        if (jwtUtil.validateJwt(token)) {
+        if (jwtUtil.validateJwt(token) && !tokenRepository.existsByToken(token)) {
             String email = jwtUtil.getEmailFromJwt(token);
 
             userRepository.findUserByEmail(email).ifPresent(user -> {
