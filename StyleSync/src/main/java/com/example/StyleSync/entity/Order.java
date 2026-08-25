@@ -23,6 +23,7 @@ public class Order {
 
     private LocalDateTime orderDate;
 
+    @Column(columnDefinition = "VARCHAR(20)") // prevents Hibernate from mapping this field to MySQL native enum type
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
@@ -33,6 +34,7 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> itemList = new ArrayList<>();
 
+    @Column(columnDefinition = "VARCHAR(20)") // prevents Hibernate from mapping this field to MySQL native enum type
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 

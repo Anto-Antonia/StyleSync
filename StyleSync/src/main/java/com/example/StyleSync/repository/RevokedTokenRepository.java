@@ -9,6 +9,6 @@ import java.time.LocalDateTime;
 @Repository
 public interface RevokedTokenRepository extends JpaRepository<RevokedToken, Integer> {
 
-    boolean existsByToken(String token);
+    boolean existsByRevokedToken(String revokedToken);
     void deleteAllByExpiresAtBefore(LocalDateTime expiresAt);
 }
